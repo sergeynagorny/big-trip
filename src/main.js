@@ -7,10 +7,11 @@ import {createControlsFilterTemplate} from "./view/controls-filter.js";
 import {createSortTemplate} from "./view/sort.js";
 import {createDaysListTemplate} from "./view/days-list.js";
 import {createDaysItemTemplate} from "./view/days-item.js";
-import {createEventEditTemplate} from "./view/event-edit.js";
-import {createEventTemplate} from "./view/event.js";
+import {createPointEditTemplate} from "./view/point-edit.js";
+import {createPointTemplate} from "./view/point.js";
 
-const EVENTS_COUNT = 3;
+
+const POINTS_COUNT = 3;
 
 
 const render = (container, template, place = `beforeEnd`) => {
@@ -35,12 +36,31 @@ render(tripControlsContainer.querySelector(`h2:nth-of-type(2)`), createControlsF
 // BOARD CONTAINER
 const tripBoard = document.querySelector(`.trip-events`);
 render(tripBoard, createSortTemplate());
-render(tripBoard, createEventEditTemplate());
+render(tripBoard, createPointEditTemplate());
 render(tripBoard, createDaysListTemplate());
 const tripDaysList = document.querySelector(`.trip-days`);
 render(tripDaysList, createDaysItemTemplate());
-const tripEventsList = document.querySelector(`.trip-events__list`);
+const tripPointsList = document.querySelector(`.trip-events__list`);
 
-for (let i = 0; i < EVENTS_COUNT; i++) {
-  render(tripEventsList, createEventTemplate());
+for (let i = 0; i < POINTS_COUNT; i++) {
+  render(tripPointsList, createPointTemplate());
 }
+
+// придумать структуру данных для компонентов так, что бы данные были отделены от  шаблона
+
+// 1. Точка маршрута, объект с полями:
+//  - Тип точки маршрута (Набор лежит в ТЗ)
+//  - Пункт назначения (Рандомный город)
+//  - Доп опции (0 -5 штук) — отдельная структура данных (с типом, названием и ценой)
+//  - Информация о месте назначения:
+//    - Описание (1 - 5 предложений)
+//    — Фотографии (1 — 5 штук) заглушка http://picsum.photos/248/152?r=${Math.random()}
+//  - Остальные данные ограничьте самостоятельно (прочесть ТЗ)
+
+// 2. Написать функцию, которая будет возвращать готовые объекты по структуре из пункта
+// 3. Переписать f по созданию маршрута, что бы она на вход принимала данные — объект определенной структуры
+// 4. Аналогичным образом для формы создания маршрута
+// 5. Разработать структуры для для остальных компонентов и вычислить для них данные на основе моков
+// 6. Для оставшихся компонентов, так же переписать функцию по созданию шаблона
+// 7. Переписать код в main.js для работы с моковыми данными. 1 - редактирование, остальные - точки маршрута
+// 8. Распределить точки маршрута согласно дате.
