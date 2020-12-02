@@ -1,7 +1,8 @@
-import {capitalizeFirstLetter} from '../utils.js';
+import {capitalizeFirstLetter, createElement} from '../utils.js';
 import {prepositionsMap} from '../const.js';
 import {dataTypes, Types} from "../model/types.js";
 import dayjs from 'dayjs';
+
 
 const createPointTypeListMarkup = (types, activeType) => {
   return Object.keys(types).map((typeGroup) => {
@@ -21,6 +22,7 @@ const createPointTypeListMarkup = (types, activeType) => {
     `);
   }).join(``);
 };
+
 
 const createOffersMarkup = (offers, activeOffers) => {
 
@@ -54,7 +56,7 @@ const formatInputTime = (time) => {
   return dayjs(time).format(`DD/MM/YY HH:mm`);
 };
 
-export const createPointEditTemplate = (point) => {
+const createPointEditTemplate = (point) => {
 
   const dateStart = formatInputTime(point.date.start);
   const dateEnd = formatInputTime(point.date.end);
@@ -137,3 +139,27 @@ export const createPointEditTemplate = (point) => {
     </form>`
   );
 };
+
+
+export default class PointEdit {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointEditTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
