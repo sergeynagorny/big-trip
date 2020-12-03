@@ -23,10 +23,9 @@ const createPointTypeListMarkup = (types, activeType) => {
   }).join(``);
 };
 
-
 const createOffersMarkup = (offers, activeOffers) => {
 
-  return offers.map((offer, index) => {
+  const offersList = offers.map((offer, index) => {
     const isChecked = activeOffers.indexOf(offer) !== -1 ? `checked` : ``;
     const offerName = `event-offer-${offer.title.replace(/\s/g, `-`).toLowerCase()}`;
     const offerId = `${offerName}-${index}`;
@@ -42,37 +41,75 @@ const createOffersMarkup = (offers, activeOffers) => {
       </div>
     `);
   }).join(`\n`);
+
+  return (`
+    <section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+      <div class="event__available-offers">
+        ${offersList}
+      </div>
+    </section>
+  `);
 };
 
-const createDestinationPhotosMarkup = (pictures) => {
-  return pictures.map((picture) => {
-    return (`
-      <img class="event__photo" src="${picture.src}" alt="${picture.description}">
+const createDestinationInfoMarkup = (destinationInfo) => {
+  const {description: destinationDescription, pictures: destinationPictures} = destinationInfo;
+
+  const createDestinationPhotosMarkup = (pictures) => {
+    const pictureList = pictures.map((picture) => {
+      return (`
+        <img class="event__photo" src="${picture.src}" alt="${picture.description}">
       `);
-  }).join(`\n`);
+    }).join(`\n`);
+
+    return (`
+      <div class="event__photos-container">
+        <div class="event__photos-tape">
+          ${pictureList}
+        </div>
+      </div>
+    `);
+  };
+
+  const createDescriptionMarkup = (description) => {
+    return (`
+      <p class="event__destination-description">${description}</p>
+    `);
+  };
+
+  const photosMarkup = (destinationPictures) ? createDestinationPhotosMarkup(destinationPictures) : ``;
+  const descriptionMarkup = (destinationDescription) ? createDescriptionMarkup(destinationDescription) : ``;
+
+
+  return (`
+    <section class="event__section  event__section--destination">
+      <h3 class="event__section-title  event__section-title--destination">Destination</h3>
+      ${descriptionMarkup}
+      ${photosMarkup}
+    </section>
+  `);
 };
 
 const formatInputTime = (time) => {
   return dayjs(time).format(`DD/MM/YY HH:mm`);
 };
 
+// TODO: datalist
+
 const createPointEditTemplate = (point) => {
+  const {destinationInfo, price, destination, type: pointType, typeInfo: {offers: activeOffers}} = point;
 
   const dateStart = formatInputTime(point.date.start);
   const dateEnd = formatInputTime(point.date.end);
-  const pointType = point.type;
-  const price = point.price;
-  const destination = point.destination;
   const preposition = prepositionsMap[point.typeInfo.type];
-  const pointDescription = point.destinationInfo.description;
-  const destinationPhotosMarkup = createDestinationPhotosMarkup(point.destinationInfo.pictures);
-  const activeOffers = point.typeInfo.offers;
-
-  const offersMarkup = createOffersMarkup(dataTypes[pointType].offers, activeOffers);
   const pointTypeListMarkup = createPointTypeListMarkup(Types, pointType);
 
-  return (
-    `<form class="trip-events__item  event  event--edit" action="#" method="post">
+  const typeOffers = dataTypes[pointType].offers;
+  const offersMarkup = (typeOffers) ? createOffersMarkup(typeOffers, activeOffers) : ``;
+  const destinationInfoMarkup = (destinationInfo) ? createDestinationInfoMarkup(destinationInfo) : ``;
+
+  return (`
+    <form class="trip-events__item  event  event--edit" action="#" method="post">
       <header class="event__header">
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
@@ -96,14 +133,10 @@ const createPointEditTemplate = (point) => {
         </div>
 
         <div class="event__field-group  event__field-group--time">
-          <label class="visually-hidden" for="event-start-time-1">
-            From
-          </label>
+          <label class="visually-hidden" for="event-start-time-1">From</label>
           <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${dateStart}">
           &mdash;
-          <label class="visually-hidden" for="event-end-time-1">
-            To
-          </label>
+          <label class="visually-hidden" for="event-end-time-1">To</label>
           <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${dateEnd}">
         </div>
 
@@ -118,26 +151,9 @@ const createPointEditTemplate = (point) => {
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
         <button class="event__reset-btn" type="reset">Cancel</button>
       </header>
-      <section class="event__details">
-        <section class="event__section  event__section--offers">
-          <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-          <div class="event__available-offers">
-            ${offersMarkup}
-          </div>
-        </section>
-
-        <section class="event__section  event__section--destination">
-          <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-          <p class="event__destination-description">${pointDescription}</p>
-
-          <div class="event__photos-container">
-            <div class="event__photos-tape">${destinationPhotosMarkup}</div>
-          </div>
-        </section>
-      </section>
-    </form>`
-  );
+      ${(offersMarkup || destinationInfoMarkup) ? `<section class="event__details">${offersMarkup} ${destinationInfoMarkup}</section>` : ``}
+    </form>
+  `);
 };
 
 

@@ -1,4 +1,4 @@
-import {capitalizeFirstLetter} from '../utils.js';
+import {capitalizeFirstLetter, createElement} from '../utils.js';
 import {prepositionsMap} from '../const.js';
 
 const castTimeFormat = (value) => {
@@ -45,7 +45,7 @@ const createOffersMarkup = (offers) => {
   }).join(`\n`);
 };
 
-export const createPointTemplate = (point) => {
+const createPointTemplate = (point) => {
 
   const city = point.destination;
   const preposition = prepositionsMap[point.typeInfo.type];
@@ -57,8 +57,8 @@ export const createPointTemplate = (point) => {
 
   const offersMarkup = createOffersMarkup(point.typeInfo.offers);
 
-  return (
-    `<li class="trip-events__item">
+  return (`
+    <li class="trip-events__item">
       <div class="event">
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${pointType}.png" alt="Event type icon">
@@ -85,6 +85,30 @@ export const createPointTemplate = (point) => {
           <span class="visually-hidden">Open event</span>
         </button>
       </div>
-    </li>`
-  );
+    </li>
+  `);
 };
+
+
+export default class Point {
+  constructor(point) {
+    this._point = point;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createPointTemplate(this._point);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
