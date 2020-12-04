@@ -15,7 +15,7 @@ import {generatePoints} from "./model/point.js";
 import {render} from "./utils.js";
 
 
-const POINTS_COUNT = 0;
+const POINTS_COUNT = 22;
 const dataPoints = generatePoints(POINTS_COUNT);
 
 
@@ -93,41 +93,13 @@ const renderPointBoard = (tripBoard, points) => {
 const tripBoard = document.querySelector(`.trip-events`);
 renderPointBoard(tripBoard, dataPoints);
 
-
-// DEFAULT_SORT
-// section.trip-events
-//    h2
-//    form
-//    ul.trip-days
-
-//       li.trip-days__item
-//           div.day__info
-//              span.day__counter
-//              time.day__date
-//           ul.trip-events__list
-//             li.trip-events__item
-
-//       li.trip-days__item
-//           div.day__info
-//              span.day__counter
-//              time.day__date
-//           ul.trip-events__list
-//             li.trip-events__item
-
-
-// #SORT_BY_TIME OR PRICE
-//  section.trip-events
-//    h2
-//    form
-//    ul.trip-days
-
-//       li.trip-days__item
-//           div.day__info
-//           ul.trip-events__list
-//             li.trip-events__item
-
-
-// #NO_POINTS
-//  section.trip-events
-//    h2
-//    p.trip-events__msg
+// 1. Абстрактный класс
+//    Выделить общие части компонентов в абстрактный класс
+//    1.1 Изучить структуру
+//    1.2 Описать абстрактный класс. +
+//        Он точно такой же как и все остальные, только создавать компонент на прямую из него нельзя.
+//    1.3 Объявить в нем общие свойства и методы, пока что пустые +
+//    1.4 Обязательно реализовать метод гетТемплайт +
+//    1.5 Унаследовать все компоненты от абстрактного класса
+//    1.6 Перенести реализацию общих методов из потомков в родителя
+//    1.7 Запустить проект

@@ -1,4 +1,5 @@
-import {capitalizeFirstLetter, createElement} from '../utils.js';
+import Abstract from "./abstract.js";
+import {capitalizeFirstLetter} from '../utils.js';
 import {prepositionsMap} from '../const.js';
 import {dataTypes, Types} from "../model/types.js";
 import dayjs from 'dayjs';
@@ -157,25 +158,13 @@ const createPointEditTemplate = (point) => {
 };
 
 
-export default class PointEdit {
+export default class PointEdit extends Abstract {
   constructor(point) {
+    super();
     this._point = point;
-    this._element = null;
   }
 
   getTemplate() {
     return createPointEditTemplate(this._point);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

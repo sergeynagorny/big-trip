@@ -1,5 +1,4 @@
-import {createElement} from "../utils.js";
-
+import Abstract from "./abstract.js";
 
 const getPointsDestinations = (data) => {
   return data.map((item) => item.destination)
@@ -16,25 +15,13 @@ const createTripRouteTemplate = (points) => {
 };
 
 
-export default class TripRoute {
+export default class TripRoute extends Abstract {
   constructor(points) {
+    super();
     this._points = points;
-    this._element = null;
   }
 
   getTemplate() {
     return createTripRouteTemplate(this._points);
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }

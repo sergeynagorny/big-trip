@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import Abstract from "./abstract.js";
 
 
 const createControlsFilterTemplate = () => {
@@ -28,24 +28,8 @@ const createControlsFilterTemplate = () => {
 };
 
 
-export default class ControlsFilter {
-  constructor() {
-    this._element = null;
-  }
-
+export default class ControlsFilter extends Abstract {
   getTemplate() {
     return createControlsFilterTemplate();
-  }
-
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
   }
 }
