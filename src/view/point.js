@@ -1,5 +1,5 @@
 import Abstract from "./abstract.js";
-import {capitalizeFirstLetter} from '../utils.js';
+import {capitalizeFirstLetter} from '../utils/common.js';
 import {prepositionsMap} from '../const.js';
 
 const castTimeFormat = (value) => {

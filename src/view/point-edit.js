@@ -1,5 +1,5 @@
 import Abstract from "./abstract.js";
-import {capitalizeFirstLetter} from '../utils.js';
+import {capitalizeFirstLetter} from '../utils/common.js';
 import {prepositionsMap} from '../const.js';
 import {dataTypes, Types} from "../model/types.js";
 import dayjs from 'dayjs';

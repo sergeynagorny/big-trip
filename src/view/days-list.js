@@ -1,5 +1,5 @@
 import {createPointTemplate} from "./point";
-import {createElement} from "../utils.js";
+import {createElement} from "../utils/render.js";
 import dayjs from 'dayjs';
 
 

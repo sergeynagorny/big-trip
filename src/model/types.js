@@ -1,4 +1,4 @@
-import {getRandomIntegerNumber, getRandomArrayItem} from '../utils.js';
+import {getRandomIntegerNumber, getRandomArrayItem} from '../utils/common.js';
 
 
 export const Types = {
