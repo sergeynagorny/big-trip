@@ -1,10 +1,34 @@
 import TripListView from "../view/trip-list.js";
 import NoPointsView from "../view/no-points.js";
-import SortView from "../view/sort.js";
+import SortView, {SortType} from "../view/sort.js";
 import PointView from "../view/point.js";
 import PointEditView from "../view/point-edit.js";
 import {render, replace} from "../utils/render.js";
 
+
+const getSortedPoints = (points, sortType) => {
+  let sortedPoints = [];
+
+  switch (sortType) {
+    case SortType.EVENT:
+      sortedPoints = points;
+      break;
+    case SortType.TIME:
+      sortedPoints = points.slice().sort((a, b) => (b.date.end - b.date.start) - (a.date.end - a.date.start));
+      break;
+    case SortType.PRICE:
+      sortedPoints = points.slice().sort((a, b) => b.price - a.price);
+      break;
+  }
+
+  return sortedPoints;
+};
+
+const renderPoints = (pointListElement, points) => {
+  points.forEach((point) => {
+    renderPoint(pointListElement, point);
+  });
+};
 
 const renderPoint = (tripList, point) => {
 
@@ -15,7 +39,6 @@ const renderPoint = (tripList, point) => {
   const replaceEditToPoint = () => {
     replace(pointView, pointEditView);
   };
-
 
   const onEscKeyDown = (evt) => {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
@@ -62,10 +85,17 @@ export default class PointsBoard {
 
     render(container, this._sortView);
     render(container, this._tripListView);
-    const tripList = document.querySelector(`.trip-events__list`);
 
-    points.forEach((point) => {
-      renderPoint(tripList, point);
+    const tripList = document.querySelector(`.trip-events__list`);
+    renderPoints(tripList, points);
+
+
+    this._sortView.setSortTypeChangeHandler((sortType) => {
+      const sortedPoints = getSortedPoints(points, sortType);
+
+      tripList.innerHTML = ``;
+
+      renderPoints(tripList, sortedPoints);
     });
   }
 }
