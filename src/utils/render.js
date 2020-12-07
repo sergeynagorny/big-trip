@@ -21,5 +21,6 @@ export const render = (container, element, place = `beforeend`) => {
   }
 };
 
-
-// TODO: изменить реализацию функций что бы в них попадали компоненты, а не ДОМ элементы
+export const replace = (parent, newElement, oldElement) => {
+  parent.replaceChild(newElement, oldElement);
+};

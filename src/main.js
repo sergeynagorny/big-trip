@@ -11,7 +11,7 @@ import PointView from "./view/point.js";
 import PointEditView from "./view/point-edit.js";
 
 import {generatePoints} from "./model/point.js";
-import {render} from "./utils/render.js";
+import {render, replace} from "./utils/render.js";
 
 
 const POINTS_COUNT = 22;
@@ -32,11 +32,11 @@ render(tripControlsContainer, new ControlsFilterView().getElement());
 const renderPoint = (tripList, point) => {
 
   const replacePointToEdit = () => {
-    tripList.replaceChild(pointEditView.getElement(), pointView.getElement());
+    replace(tripList, pointEditView.getElement(), pointView.getElement());
   };
 
   const replaceEditToPoint = () => {
-    tripList.replaceChild(pointView.getElement(), pointEditView.getElement());
+    replace(tripList, pointView.getElement(), pointEditView.getElement());
   };
 
 
