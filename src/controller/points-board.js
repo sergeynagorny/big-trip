@@ -76,7 +76,7 @@ export default class PointsBoard {
   }
 
   render(points) {
-    const container = this._container; // Не забыть добавить .getContent() после рефакторинга
+    const container = this._container.getElement();
 
     if (points.length === 0) {
       render(container, this._noPoinstView);
