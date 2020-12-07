@@ -19,14 +19,14 @@ const dataPoints = generatePoints(POINTS_COUNT);
 
 
 const tripInfoContainer = document.querySelector(`.trip-main`);
-render(tripInfoContainer, new TripInfoView().getElement(), `afterbegin`);
+render(tripInfoContainer, new TripInfoView(), `afterbegin`);
 
 const tripInfoPriceContainer = document.querySelector(`.trip-main__trip-info`);
-render(tripInfoPriceContainer, new TripCostView(dataPoints).getElement());
+render(tripInfoPriceContainer, new TripCostView(dataPoints));
 
 const tripControlsContainer = document.querySelector(`.trip-main__trip-controls`);
-render(tripControlsContainer, new ControlsMenuView().getElement());
-render(tripControlsContainer, new ControlsFilterView().getElement());
+render(tripControlsContainer, new ControlsMenuView());
+render(tripControlsContainer, new ControlsFilterView());
 
 
 const renderPoint = (tripList, point) => {
@@ -66,22 +66,22 @@ const renderPoint = (tripList, point) => {
   });
 
 
-  render(tripList, pointView.getElement());
+  render(tripList, pointView);
 };
 
 const renderPointBoard = (tripBoard, points) => {
 
   if (points.length === 0) {
-    render(tripBoard, new NoPointsView().getElement());
+    render(tripBoard, new NoPointsView());
     return;
   }
 
   const tripInfoMetadataContainer = document.querySelector(`.trip-info__main`);
-  render(tripInfoMetadataContainer, new TripRouteView(dataPoints).getElement());
-  render(tripInfoMetadataContainer, new TripDatesView(dataPoints).getElement());
+  render(tripInfoMetadataContainer, new TripRouteView(dataPoints));
+  render(tripInfoMetadataContainer, new TripDatesView(dataPoints));
 
-  render(tripBoard, new SortView().getElement());
-  render(tripBoard, new TripListView().getElement());
+  render(tripBoard, new SortView());
+  render(tripBoard, new TripListView());
   const tripList = document.querySelector(`.trip-events__list`);
 
   points.forEach((point) => {
