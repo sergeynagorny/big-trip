@@ -167,4 +167,8 @@ export default class PointEdit extends Abstract {
   getTemplate() {
     return createPointEditTemplate(this._point);
   }
+
+  setSubmitHandler(handler) {
+    this.getElement().addEventListener(`submit`, handler);
+  }
 }

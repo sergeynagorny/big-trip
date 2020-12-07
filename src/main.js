@@ -49,22 +49,18 @@ const renderPoint = (tripList, point) => {
     }
   };
 
-
   const pointView = new PointView(point);
-  const editButton = pointView.getElement().querySelector(`.event__rollup-btn`);
-  editButton.addEventListener(`click`, () => {
+  pointView.setEditButtonClickHandler(() => {
     replacePointToEdit();
     document.addEventListener(`keydown`, onEscKeyDown);
   });
 
   const pointEditView = new PointEditView(point);
-  const editForm = pointEditView.getElement();
-  editForm.addEventListener(`submit`, (evt) => {
+  pointEditView.setSubmitHandler((evt) => {
     evt.preventDefault();
     replaceEditToPoint();
     document.removeEventListener(`keydown`, onEscKeyDown);
   });
-
 
   render(tripList, pointView);
 };
