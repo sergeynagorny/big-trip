@@ -32,11 +32,11 @@ render(tripControlsContainer, new ControlsFilterView());
 const renderPoint = (tripList, point) => {
 
   const replacePointToEdit = () => {
-    replace(tripList, pointEditView.getElement(), pointView.getElement());
+    replace(pointEditView, pointView);
   };
 
   const replaceEditToPoint = () => {
-    replace(tripList, pointView.getElement(), pointEditView.getElement());
+    replace(pointView, pointEditView);
   };
 
 
