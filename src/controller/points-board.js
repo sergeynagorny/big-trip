@@ -4,6 +4,7 @@ import SortView, {SortType} from "../view/sort.js";
 import {render} from "../utils/render.js";
 import PointController from "./point.js";
 
+
 const getSortedPoints = (points, sortType) => {
   let sortedPoints = [];
 
@@ -22,43 +23,52 @@ const getSortedPoints = (points, sortType) => {
   return sortedPoints;
 };
 
-const renderPoints = (pointListElement, points) => {
-  points.forEach((point) => {
-    const newPoint = new PointController(pointListElement);
-    newPoint.render(point);
+const renderPoints = (container, points) => {
+  return points.map((point) => {
+    const pointController = new PointController(container);
+    pointController.render(point);
+
+    return pointController;
   });
 };
+
 
 export default class PointsBoard {
   constructor(container) {
     this._container = container;
 
+    this._points = null;
+    this._showedPointControllers = [];
     this._noPoinstView = new NoPointsView();
     this._sortView = new SortView();
     this._tripListView = new TripListView();
+
+    this._onSortTypeChange = this._onSortTypeChange.bind(this);
+    this._sortView.setSortTypeChangeHandler(this._onSortTypeChange);
   }
 
   render(points) {
     const container = this._container.getElement();
+    this._points = points;
 
-    if (points.length === 0) { // если поинтов нет
-      render(container, this._noPoinstView); // ставим заглушку
-      return; // выходим
+    if (this._points.length === 0) {
+      render(container, this._noPoinstView);
+      return;
     }
 
     render(container, this._sortView);
     render(container, this._tripListView);
 
-    const tripList = document.querySelector(`.trip-events__list`); // находим контейнер
-    renderPoints(tripList, points); // рисуем поинты
+    const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
+    this._showedPointControllers = renderPoints(tripList, this._points);
+  }
 
+  _onSortTypeChange(sortType) {
+    const sortedPoints = getSortedPoints(this._points, sortType);
 
-    this._sortView.setSortTypeChangeHandler((sortType) => { // произошел клик по сортировке
-      const sortedPoints = getSortedPoints(points, sortType); // получаем отсортированные данные
+    const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
+    tripList.innerHTML = ``;
 
-      tripList.innerHTML = ``; // чистим доску
-
-      renderPoints(tripList, sortedPoints); // рисуем поинты с новыми данными
-    });
+    this._showedPointControllers = renderPoints(tripList, sortedPoints);
   }
 }
