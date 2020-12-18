@@ -1,10 +1,8 @@
 import TripListView from "../view/trip-list.js";
 import NoPointsView from "../view/no-points.js";
 import SortView, {SortType} from "../view/sort.js";
-import PointView from "../view/point.js";
-import PointEditView from "../view/point-edit.js";
-import {render, replace} from "../utils/render.js";
-
+import {render} from "../utils/render.js";
+import PointController from "./point.js";
 
 const getSortedPoints = (points, sortType) => {
   let sortedPoints = [];
@@ -26,45 +24,10 @@ const getSortedPoints = (points, sortType) => {
 
 const renderPoints = (pointListElement, points) => {
   points.forEach((point) => {
-    renderPoint(pointListElement, point);
+    const newPoint = new PointController(pointListElement);
+    newPoint.render(point);
   });
 };
-
-const renderPoint = (tripList, point) => {
-
-  const replacePointToEdit = () => {
-    replace(pointEditView, pointView);
-  };
-
-  const replaceEditToPoint = () => {
-    replace(pointView, pointEditView);
-  };
-
-  const onEscKeyDown = (evt) => {
-    const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
-
-    if (isEscKey) {
-      replaceEditToPoint();
-      document.removeEventListener(`keydown`, onEscKeyDown);
-    }
-  };
-
-  const pointView = new PointView(point);
-  pointView.setEditButtonClickHandler(() => {
-    replacePointToEdit();
-    document.addEventListener(`keydown`, onEscKeyDown);
-  });
-
-  const pointEditView = new PointEditView(point);
-  pointEditView.setSubmitHandler((evt) => {
-    evt.preventDefault();
-    replaceEditToPoint();
-    document.removeEventListener(`keydown`, onEscKeyDown);
-  });
-
-  render(tripList, pointView);
-};
-
 
 export default class PointsBoard {
   constructor(container) {
@@ -78,24 +41,24 @@ export default class PointsBoard {
   render(points) {
     const container = this._container.getElement();
 
-    if (points.length === 0) {
-      render(container, this._noPoinstView);
-      return;
+    if (points.length === 0) { // если поинтов нет
+      render(container, this._noPoinstView); // ставим заглушку
+      return; // выходим
     }
 
     render(container, this._sortView);
     render(container, this._tripListView);
 
-    const tripList = document.querySelector(`.trip-events__list`);
-    renderPoints(tripList, points);
+    const tripList = document.querySelector(`.trip-events__list`); // находим контейнер
+    renderPoints(tripList, points); // рисуем поинты
 
 
-    this._sortView.setSortTypeChangeHandler((sortType) => {
-      const sortedPoints = getSortedPoints(points, sortType);
+    this._sortView.setSortTypeChangeHandler((sortType) => { // произошел клик по сортировке
+      const sortedPoints = getSortedPoints(points, sortType); // получаем отсортированные данные
 
-      tripList.innerHTML = ``;
+      tripList.innerHTML = ``; // чистим доску
 
-      renderPoints(tripList, sortedPoints);
+      renderPoints(tripList, sortedPoints); // рисуем поинты с новыми данными
     });
   }
 }
