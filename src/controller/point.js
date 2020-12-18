@@ -44,6 +44,9 @@ export default class PointController {
       evt.preventDefault();
       this._replaceEditToPoint();
     });
+
+    this._pointView.setFavoritesButtonClickHandler(() => {
+    });
   }
 
   _replacePointToEdit() {
