@@ -48,19 +48,17 @@ export default class Sort extends Abstract {
   }
 
   setSortTypeChangeHandler(handler) {
-    this.getElement().addEventListener(`click`, (evt) => {
-      if (evt.target.tagName !== `INPUT`) {
-        return;
-      }
+    const inputs = this.getElement().querySelectorAll(`.trip-sort__input`);
 
-      const sortType = evt.target.value;
+    inputs.forEach((input) => {
+      input.addEventListener(`click`, (evt) => {
+        const sortType = evt.target.value;
 
-      if (this._currenSortType === sortType) {
-        return;
-      }
-
-      this._currenSortType = sortType;
-      handler(this._currenSortType);
+        if (this._currenSortType !== sortType) {
+          this._currenSortType = sortType;
+          handler(this._currenSortType);
+        }
+      });
     });
   }
 }

@@ -2,24 +2,21 @@ import {createPointTemplate} from "./point";
 import {createElement} from "../utils/render.js";
 import dayjs from 'dayjs';
 
-
 // const func = (data) => {
 //   const secondObj = {};
 
 //   data.forEach((point) => {
-//     const pointType = point.type;
+//     const pointDate = `${dayjs(point.date.start).format(`YYYY-MM-DD`)}`;
 
-//     if (secondObj[pointType]) {
-//       secondObj[pointType].push(point);
+//     if (secondObj[pointDate]) {
+//       secondObj[pointDate].push(point);
 //     } else {
-//       secondObj[pointType] = [point];
+//       secondObj[pointDate] = [point];
 //     }
 //   });
 
 //   return secondObj;
 // };
-
-// console.log(func(dataPoints));
 
 const getEventDateList = (data) => {
   const array = data.map((item) => {
