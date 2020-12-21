@@ -1,6 +1,6 @@
 import Abstract from "./abstract.js";
 import {capitalizeFirstLetter} from '../utils/common.js';
-import {TYPE} from "../model/types.js";
+import {TYPE} from "../mock/types.js";
 import {prepositionsMap} from '../const.js';
 
 const castTimeFormat = (value) => {

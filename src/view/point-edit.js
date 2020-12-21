@@ -1,8 +1,8 @@
 import AbstractSmart from "./abstract-smart.js";
 import {capitalizeFirstLetter} from '../utils/common.js';
 import {prepositionsMap} from '../const.js';
-import {TYPE, Types} from "../model/types.js";
-import {CITY} from "../model/cities.js";
+import {TYPE, Types} from "../mock/types.js";
+import {CITY} from "../mock/cities.js";
 import dayjs from 'dayjs';
 
 
