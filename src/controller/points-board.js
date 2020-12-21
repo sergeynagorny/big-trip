@@ -46,7 +46,10 @@ export default class PointsBoard {
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
+    this._onFilterChange = this._onFilterChange.bind(this);
+
     this._sortView.setSortTypeChangeHandler(this._onSortTypeChange);
+    this._pointsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
   render() {
@@ -64,9 +67,23 @@ export default class PointsBoard {
     this._renderPoints(points);
   }
 
+  _removePoints() {
+    this._showedPointControllers.forEach((pointController) => pointController.destroy());
+    this._showedPointControllers = [];
+  }
+
   _renderPoints(points) {
     const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
     this._showedPointControllers = renderPoints(tripList, points, this._onDataChange, this._onViewChange);
+  }
+
+  _updatePoints() {
+    this._removePoints();
+    this._renderPoints(this._pointsModel.getPoints());
+  }
+
+  _onFilterChange() {
+    this._updatePoints();
   }
 
   _onViewChange() {

@@ -16,7 +16,7 @@ pointsModel.setPoints(dataPoints);
 
 
 const headerView = new HeaderView();
-const headerController = new HeaderController(headerView);
+const headerController = new HeaderController(headerView, pointsModel);
 headerController.render(dataPoints);
 render(body, headerView, `afterbegin`);
 

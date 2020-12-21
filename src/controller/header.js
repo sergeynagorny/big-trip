@@ -2,16 +2,18 @@ import TripRouteView from "../view/trip-route.js";
 import TripDatesView from "../view/trip-dates.js";
 import TripCostView from "../view/trip-cost.js";
 import ControlsMenuView from "../view/controls-menu.js";
-import ControlsFilterView from "../view/controls-filter.js";
+import FilterView from "../view/filter.js";
+import FilterController from "../controller/filter.js";
 import {render} from "../utils/render.js";
 
 
 export default class Header {
-  constructor(container) {
+  constructor(container, pointsModel) {
     this._container = container;
+    this._pointsModel = pointsModel;
 
     this._controlsMenuView = new ControlsMenuView();
-    this._controlsFilterView = new ControlsFilterView();
+    this._filterView = new FilterView();
   }
 
   render(points) {
@@ -22,7 +24,9 @@ export default class Header {
 
     const containerContolsElement = container.querySelector(`.trip-controls`);
     render(containerContolsElement, this._controlsMenuView);
-    render(containerContolsElement, this._controlsFilterView);
+    // render(containerContolsElement, this._filterView);
+    const filterController = new FilterController(containerContolsElement, this._pointsModel);
+    filterController.render();
 
     if (points.length === 0) {
       return;
