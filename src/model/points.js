@@ -5,16 +5,16 @@ export default class Points {
     this._dataChangeHandlers = [];
   }
 
-  getTasks() {
+  getPoints() {
     return this._points;
   }
 
-  setTasks(points) {
+  setPoints(points) {
     this._points = Array.from(points);
     this._callHandlers(this._dataChangeHandlers);
   }
 
-  updateTask(id, point) {
+  updatePoint(id, point) {
     const index = this._points.findIndex((it) => it.id === id);
 
     if (index === -1) {

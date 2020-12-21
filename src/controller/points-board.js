@@ -34,10 +34,10 @@ const renderPoints = (container, points, onDataChange, onViewChange) => {
 
 
 export default class PointsBoard {
-  constructor(container) {
+  constructor(container, pointsModel) {
     this._container = container;
+    this._pointsModel = pointsModel;
 
-    this._points = null;
     this._showedPointControllers = [];
     this._noPoinstView = new NoPointsView();
     this._sortView = new SortView();
@@ -49,11 +49,11 @@ export default class PointsBoard {
     this._sortView.setSortTypeChangeHandler(this._onSortTypeChange);
   }
 
-  render(points) {
+  render() {
     const container = this._container.getElement();
-    this._points = points;
+    const points = this._pointsModel.getPoints();
 
-    if (this._points.length === 0) {
+    if (points.length === 0) {
       render(container, this._noPoinstView);
       return;
     }
@@ -61,8 +61,12 @@ export default class PointsBoard {
     render(container, this._sortView);
     render(container, this._tripListView);
 
+    this._renderPoints(points);
+  }
+
+  _renderPoints(points) {
     const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
-    this._showedPointControllers = renderPoints(tripList, this._points, this._onDataChange, this._onViewChange);
+    this._showedPointControllers = renderPoints(tripList, points, this._onDataChange, this._onViewChange);
   }
 
   _onViewChange() {
@@ -70,15 +74,15 @@ export default class PointsBoard {
   }
 
   _onDataChange(pointController, oldData, newData) {
-    const index = this._points.findIndex((it) => it === oldData);
-    if (index !== -1) {
-      this._points = [].concat(this._points.slice(0, index), newData, this._points.slice(index + 1));
+    const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+
+    if (isSuccess) {
       pointController.render(newData);
     }
   }
 
   _onSortTypeChange(sortType) {
-    const sortedPoints = getSortedPoints(this._points, sortType);
+    const sortedPoints = getSortedPoints(this._pointsModel.getPoints(), sortType);
 
     const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
     tripList.innerHTML = ``;
