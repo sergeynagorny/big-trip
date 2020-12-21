@@ -23,9 +23,9 @@ const getSortedPoints = (points, sortType) => {
   return sortedPoints;
 };
 
-const renderPoints = (container, points) => {
+const renderPoints = (container, points, onDataChange, onViewChange) => {
   return points.map((point) => {
-    const pointController = new PointController(container);
+    const pointController = new PointController(container, onDataChange, onViewChange);
     pointController.render(point);
 
     return pointController;
@@ -43,6 +43,8 @@ export default class PointsBoard {
     this._sortView = new SortView();
     this._tripListView = new TripListView();
 
+    this._onDataChange = this._onDataChange.bind(this);
+    this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._sortView.setSortTypeChangeHandler(this._onSortTypeChange);
   }
@@ -60,7 +62,19 @@ export default class PointsBoard {
     render(container, this._tripListView);
 
     const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
-    this._showedPointControllers = renderPoints(tripList, this._points);
+    this._showedPointControllers = renderPoints(tripList, this._points, this._onDataChange, this._onViewChange);
+  }
+
+  _onViewChange() {
+    this._showedPointControllers.forEach((it) => it.setDefaultView());
+  }
+
+  _onDataChange(pointController, oldData, newData) {
+    const index = this._points.findIndex((it) => it === oldData);
+    if (index !== -1) {
+      this._points = [].concat(this._points.slice(0, index), newData, this._points.slice(index + 1));
+      pointController.render(newData);
+    }
   }
 
   _onSortTypeChange(sortType) {
@@ -69,6 +83,6 @@ export default class PointsBoard {
     const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
     tripList.innerHTML = ``;
 
-    this._showedPointControllers = renderPoints(tripList, sortedPoints);
+    this._showedPointControllers = renderPoints(tripList, sortedPoints, this._onDataChange, this._onViewChange);
   }
 }

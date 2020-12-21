@@ -1,7 +1,8 @@
-import Abstract from "./abstract.js";
+import AbstractSmart from "./abstract-smart.js";
 import {capitalizeFirstLetter} from '../utils/common.js';
 import {prepositionsMap} from '../const.js';
-import {dataTypes, Types} from "../model/types.js";
+import {TYPE, Types} from "../model/types.js";
+import {CITY} from "../model/cities.js";
 import dayjs from 'dayjs';
 
 
@@ -25,15 +26,15 @@ const createPointTypeListMarkup = (types, activeType) => {
 };
 
 const createOffersMarkup = (offers, activeOffers) => {
-
   const offersList = offers.map((offer, index) => {
-    const isChecked = activeOffers.indexOf(offer) !== -1 ? `checked` : ``;
+    const isChecked = activeOffers.findIndex((activeOffer) => activeOffer.title === offer.title) !== -1 ? `checked` : ``;
     const offerName = `event-offer-${offer.title.replace(/\s/g, `-`).toLowerCase()}`;
     const offerId = `${offerName}-${index}`;
 
+
     return (`
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="${offerId}" type="checkbox" name="${offerName}" ${isChecked}>
+        <input class="event__offer-checkbox visually-hidden" data-title="${offer.title}" data-price="${offer.price}" id="${offerId}" type="checkbox" name="${offerName}" ${isChecked}>
         <label class="event__offer-label" for="${offerId}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;
@@ -97,15 +98,15 @@ const formatInputTime = (time) => {
 
 // TODO: datalist
 
-const createPointEditTemplate = (point) => {
-  const {destinationInfo, price, destination, type: pointType, typeInfo: {offers: activeOffers}} = point;
+const createPointEditTemplate = (point, options = {}) => {
+  const {destinationInfo, price, destination, type, typeInfo: {offers: activeOffers}} = options;
 
   const dateStart = formatInputTime(point.date.start);
   const dateEnd = formatInputTime(point.date.end);
-  const preposition = prepositionsMap[point.typeInfo.type];
-  const pointTypeListMarkup = createPointTypeListMarkup(Types, pointType);
+  const preposition = prepositionsMap[TYPE[type].type];
+  const pointTypeListMarkup = createPointTypeListMarkup(Types, type);
 
-  const typeOffers = dataTypes[pointType].offers;
+  const typeOffers = TYPE[type].offers;
   const offersMarkup = (typeOffers) ? createOffersMarkup(typeOffers, activeOffers) : ``;
   const destinationInfoMarkup = (destinationInfo) ? createDestinationInfoMarkup(destinationInfo) : ``;
 
@@ -115,7 +116,7 @@ const createPointEditTemplate = (point) => {
         <div class="event__type-wrapper">
           <label class="event__type  event__type-btn" for="event-type-toggle-1">
             <span class="visually-hidden">Choose event type</span>
-            <img class="event__type-icon" width="17" height="17" src="img/icons/${pointType}.png" alt="Event type icon">
+            <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event type icon">
           </label>
           <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -123,7 +124,7 @@ const createPointEditTemplate = (point) => {
         </div>
 
         <div class="event__field-group  event__field-group--destination">
-          <label class="event__label  event__type-output" for="event-destination-1">${capitalizeFirstLetter(pointType)} ${preposition}</label>
+          <label class="event__label  event__type-output" for="event-destination-1">${capitalizeFirstLetter(type)} ${preposition}</label>
           <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination}" list="destination-list-1">
           <datalist id="destination-list-1">
             <option value="Amsterdam"></option>
@@ -158,17 +159,114 @@ const createPointEditTemplate = (point) => {
 };
 
 
-export default class PointEdit extends Abstract {
+export default class PointEdit extends AbstractSmart {
   constructor(point) {
     super();
+
     this._point = point;
+    this._submitHandler = null;
+
+    this._destination = point.destination;
+    this._destinationInfo = point.destinationInfo;
+    this._price = point.price;
+    this._type = point.type;
+    this._offers = point.typeInfo.offers;
+    this._eventStart = point.date.start;
+    this._eventEnd = point.date.end;
+
+    this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createPointEditTemplate(this._point);
+    return createPointEditTemplate(this._point, {
+      destination: this._destination,
+      destinationInfo: CITY[this._destination],
+      price: this._price,
+      type: this._type,
+      typeInfo: {
+        offers: this._offers,
+      },
+      date: {
+        start: this._eventStart,
+        end: this._eventEnd,
+      },
+    });
+  }
+
+  recoveryListeners() {
+    this.setSubmitHandler(this._submitHandler);
+    this._subscribeOnEvents();
+  }
+
+  rerender() {
+    super.rerender();
+  }
+
+  reset() {
+    const point = this._point;
+
+    this._destination = point.destination;
+    this._destinationInfo = point.destinationInfo;
+    this._price = point.price;
+    this._type = point.type;
+    this._offers = point.typeInfo.offers;
+    this._eventStart = point.date.start;
+    this._eventEnd = point.date.end;
+
+    this.rerender();
   }
 
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
+    this._submitHandler = handler;
+  }
+
+  _subscribeOnEvents() {
+    const pointEdit = this.getElement();
+    const eventsList = pointEdit.querySelector(`.event__type-list`);
+    const destinationInput = pointEdit.querySelector(`.event__input--destination`);
+    const eventStartInput = pointEdit.querySelector(`input[name="event-start-time"]`);
+    const eventEndInput = pointEdit.querySelector(`input[name="event-end-time"]`);
+    const availableOffers = pointEdit.querySelector(`.event__available-offers`);
+    const priceInput = pointEdit.querySelector(`.event__input--price`);
+
+    eventStartInput.addEventListener(`click`, () => {
+      this._eventStart = eventStartInput.value;
+      this.rerender();
+    });
+
+    eventEndInput.addEventListener(`click`, () => {
+      this._eventEnd = eventEndInput.value;
+      this.rerender();
+    });
+
+    eventsList.addEventListener(`input`, (evt) => {
+      this._type = evt.target.value;
+      this._offers = [];
+      this.rerender();
+    });
+
+    destinationInput.addEventListener(`change`, () => {
+      this._destination = destinationInput.value;
+      this.rerender();
+    });
+
+    priceInput.addEventListener(`change`, () => {
+      this._price = priceInput.value;
+      this.rerender();
+    });
+
+    availableOffers.addEventListener(`input`, () => {
+      const availableOffersInputs = Array.from(availableOffers.querySelectorAll(`.event__offer-checkbox:checked`));
+      this._offers = availableOffersInputs.map((it) => {
+        return {
+          price: Number(it.dataset.price),
+          title: it.dataset.title,
+        };
+      });
+      this.rerender();
+    });
+
+
   }
 }

@@ -1,9 +1,6 @@
 import {getRandomArrayItem, getRandomIntegerNumber} from '../utils/common.js';
-import {City, generateCities} from "./cities.js";
-import {dataTypes} from "./types.js";
-
-const dataCities = generateCities();
-
+import {CITY} from "./cities.js";
+import {TYPE} from "./types.js";
 
 const getRandomDate = () => {
   const dateStart = new Date();
@@ -32,18 +29,25 @@ const getRandomOffers = (offers) => {
   });
 };
 
+const generateOffers = (array) => {
+  return array.map((it) => {
+    return Object.assign({}, it, {isActive: Boolean(getRandomIntegerNumber(0, 2))});
+  });
+};
+
+
 export const generatePoint = () => {
-  const destination = getRandomArrayItem(City.names);
-  const type = getRandomArrayItem(Object.keys(dataTypes));
+  const destination = getRandomArrayItem(Object.keys(CITY));
+  const type = getRandomArrayItem(Object.keys(TYPE));
 
   return {
     type,
     destination,
     price: getRandomIntegerNumber(1, 50) * 5,
-    destinationInfo: dataCities[destination],
+    destinationInfo: CITY[destination],
+    energy: generateOffers(TYPE[type].offers),
     typeInfo: {
-      type: dataTypes[type].type,
-      offers: getRandomOffers(dataTypes[type].offers),
+      offers: getRandomOffers(TYPE[type].offers),
     },
     isFavorite: Boolean(getRandomIntegerNumber(0, 2)),
     date: getRandomDate(),

@@ -48,4 +48,4 @@ export const generatePointTypes = () => {
   return someobj;
 };
 
-export const dataTypes = generatePointTypes();
+export const TYPE = generatePointTypes();

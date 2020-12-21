@@ -41,3 +41,5 @@ export const generateCities = () => {
     return acc;
   }, {});
 };
+
+export const CITY = generateCities();

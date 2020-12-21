@@ -15,7 +15,8 @@ const calculateFullPrice = (points) => {
 };
 
 const createTripCostTemplate = (points) => {
-  const fullCost = calculateFullPrice(points);
+  // const fullCost = calculateFullPrice(points);
+  const fullCost = 400;
 
   return (`
     <p class="trip-info__cost">Total: &euro;&nbsp;

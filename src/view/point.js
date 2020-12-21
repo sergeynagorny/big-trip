@@ -1,5 +1,6 @@
 import Abstract from "./abstract.js";
 import {capitalizeFirstLetter} from '../utils/common.js';
+import {TYPE} from "../model/types.js";
 import {prepositionsMap} from '../const.js';
 
 const castTimeFormat = (value) => {
@@ -49,7 +50,7 @@ const createOffersMarkup = (offers) => {
 const createPointTemplate = (point) => {
 
   const city = point.destination;
-  const preposition = prepositionsMap[point.typeInfo.type];
+  const preposition = prepositionsMap[TYPE[point.type].type];
   const pointType = point.type;
   const dateStart = point.date.start;
   const dateEnd = point.date.end;

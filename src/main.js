@@ -11,6 +11,8 @@ const boardContainer = document.querySelector(`.page-body__container`);
 const POINTS_COUNT = 10;
 const dataPoints = generatePoints(POINTS_COUNT);
 
+console.log(dataPoints);
+
 const headerView = new HeaderView();
 const headerController = new HeaderController(headerView);
 headerController.render(dataPoints);
