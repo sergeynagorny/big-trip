@@ -5,6 +5,35 @@ import {TYPE, Types} from "../mock/types.js";
 import {CITY} from "../mock/cities.js";
 import dayjs from 'dayjs';
 
+const parseFormData = (formData) => {
+  const destination = formData.get(`event-destination`);
+  const type = formData.get(`event-type`);
+  const offers = formData.getAll(`event-offer`).map((it) => {
+    const element = document.querySelector(`input[value="${it}"]`);
+    return {
+      title: it,
+      price: element.dataset.price,
+    };
+  });
+
+  return {
+    destination,
+    destinationInfo: CITY[destination],
+    price: formData.get(`event-price`),
+    type,
+    typeInfo: {
+      offers,
+    },
+    date: {
+      start: new Date(),
+      end: new Date(),
+    },
+    // date: {
+    //   start: formData.get(`event-start-time`),
+    //   end: formData.get(`event-end-time`),
+    // },
+  };
+};
 
 const createPointTypeListMarkup = (types, activeType) => {
   return Object.keys(types).map((typeGroup) => {
@@ -34,7 +63,7 @@ const createOffersMarkup = (offers, activeOffers) => {
 
     return (`
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox visually-hidden" data-title="${offer.title}" data-price="${offer.price}" id="${offerId}" type="checkbox" name="${offerName}" ${isChecked}>
+        <input class="event__offer-checkbox visually-hidden" value="${offer.title}" data-title="${offer.title}" data-price="${offer.price}" id="${offerId}" type="checkbox" name="event-offer" ${isChecked}>
         <label class="event__offer-label" for="${offerId}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;
@@ -165,6 +194,7 @@ export default class PointEdit extends AbstractSmart {
 
     this._point = point;
     this._submitHandler = null;
+    this._deleteButtonClickHandler = null;
 
     this._destination = point.destination;
     this._destinationInfo = point.destinationInfo;
@@ -193,8 +223,18 @@ export default class PointEdit extends AbstractSmart {
     });
   }
 
+  removeElement() {
+    // if (this._flatpickr) {
+    //   this._flatpickr.destroy();
+    //   this._flatpickr = null;
+    // }
+
+    super.removeElement();
+  }
+
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
+    this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -216,9 +256,23 @@ export default class PointEdit extends AbstractSmart {
     this.rerender();
   }
 
+  getData() {
+    const form = this.getElement();
+    const formData = new FormData(form);
+
+
+    return parseFormData(formData);
+  }
+
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
     this._submitHandler = handler;
+  }
+
+  setDeleteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
+
+    this._deleteButtonClickHandler = handler;
   }
 
   _subscribeOnEvents() {
@@ -266,7 +320,5 @@ export default class PointEdit extends AbstractSmart {
       });
       this.rerender();
     });
-
-
   }
 }

@@ -2,10 +2,12 @@ import PointView from "../view/point.js";
 import PointEditView from "../view/point-edit.js";
 import {render, remove, replace} from "../utils/render.js";
 
-const Mode = {
+export const Mode = {
   DEFAULT: `default`,
   EDIT: `edit`,
 };
+
+export const EmptyPoint = {};
 
 export default class PointController {
   constructor(container, onDataChange, onViewChange) {
@@ -21,8 +23,9 @@ export default class PointController {
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
-  render(point) {
+  render(point, mode) {
     this._point = point;
+    this._mode = mode;
 
     const oldPointView = this._pointView;
     const oldPointEditView = this._pointEditView;
@@ -34,6 +37,7 @@ export default class PointController {
     if (oldPointView && oldPointEditView) {
       replace(this._pointView, oldPointView);
       replace(this._pointEditView, oldPointEditView);
+      this._replaceEditToPoint();
     } else {
       render(this._container, this._pointView);
     }
@@ -58,7 +62,12 @@ export default class PointController {
 
     this._pointEditView.setSubmitHandler((evt) => {
       evt.preventDefault();
-      this._replaceEditToPoint();
+      const data = this._pointEditView.getData();
+      this._onDataChange(this, this._point, data);
+    });
+
+    this._pointEditView.setDeleteButtonClickHandler(() => {
+      this._onDataChange(this, this._point, null);
     });
 
     this._pointView.setFavoritesButtonClickHandler(() => {
@@ -76,9 +85,13 @@ export default class PointController {
   }
 
   _replaceEditToPoint() {
-    this._pointEditView.reset(); // при закрытии, сбрасывает данные до дефолта
-    replace(this._pointView, this._pointEditView);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+    this._pointEditView.reset(); // при закрытии, сбрасывает данные до дефолта
+
+    if (document.contains(this._pointEditView.getElement())) {
+      replace(this._pointView, this._pointEditView);
+    }
+
     this._mode = Mode.DEFAULT;
   }
 

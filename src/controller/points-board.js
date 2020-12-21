@@ -2,7 +2,7 @@ import TripListView from "../view/trip-list.js";
 import NoPointsView from "../view/no-points.js";
 import SortView, {SortType} from "../view/sort.js";
 import {render} from "../utils/render.js";
-import PointController from "./point.js";
+import PointController, {Mode as PointControllerMode, EmptyPoint} from "./point.js";
 
 
 const getSortedPoints = (points, sortType) => {
@@ -26,7 +26,7 @@ const getSortedPoints = (points, sortType) => {
 const renderPoints = (container, points, onDataChange, onViewChange) => {
   return points.map((point) => {
     const pointController = new PointController(container, onDataChange, onViewChange);
-    pointController.render(point);
+    pointController.render(point, PointControllerMode.DEFAULT);
 
     return pointController;
   });
@@ -91,10 +91,27 @@ export default class PointsBoard {
   }
 
   _onDataChange(pointController, oldData, newData) {
-    const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+    if (oldData === EmptyPoint) {
+      this._creatingPoint = null;
 
-    if (isSuccess) {
-      pointController.render(newData);
+      if (newData === null) {
+        pointController.destroy();
+        this._updatePoints();
+      } else {
+        this._pointsModel.addTask(newData);
+        pointController.render(newData, PointControllerMode.DEFAULT);
+
+        this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
+      }
+    } else if (newData === null) {
+      this._pointsModel.removePoint(oldData.id);
+      this._updatePoints();
+    } else {
+      const isSuccess = this._pointsModel.updatePoint(oldData.id, newData);
+
+      if (isSuccess) {
+        pointController.render(newData, PointControllerMode.DEFAULT);
+      }
     }
   }
 
