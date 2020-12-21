@@ -101,9 +101,7 @@ export default class PointsBoard {
   _onSortTypeChange(sortType) {
     const sortedPoints = getSortedPoints(this._pointsModel.getPoints(), sortType);
 
-    const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
-    tripList.innerHTML = ``;
-
-    this._showedPointControllers = renderPoints(tripList, sortedPoints, this._onDataChange, this._onViewChange);
+    this._removePoints();
+    this._renderPoints(sortedPoints);
   }
 }
