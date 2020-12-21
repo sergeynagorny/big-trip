@@ -14,10 +14,6 @@ export default class AbstractSmart extends Abstract {
 
     const newElement = this.getElement();
 
-    console.log(oldElement);
-    console.log(newElement);
-    console.log(parent);
-
     parent.replaceChild(newElement, oldElement);
 
     this.recoveryListeners();

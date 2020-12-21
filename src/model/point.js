@@ -41,6 +41,7 @@ export const generatePoint = () => {
   const type = getRandomArrayItem(Object.keys(TYPE));
 
   return {
+    id: String(new Date() + Math.random()),
     type,
     destination,
     price: getRandomIntegerNumber(1, 50) * 5,
