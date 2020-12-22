@@ -24,3 +24,16 @@ const pointsBoardView = new PointsBoardView();
 render(boardContainer, pointsBoardView);
 const pointsBoardController = new PointsBoardController(pointsBoardView, pointsModel);
 pointsBoardController.render();
+
+
+const AUTHORIZATION = `Basic dXNlckBwYXNzd29yZAo=`;
+const URL_TASKMANAGER = `https://11.ecmascript.pages.academy/task-manager/tasks`;
+const URL_CINEMADDICT = `https://11.ecmascript.pages.academy/cinemaddict/movies`;
+const URL_BIGTRIP_POINTS = `https://13.ecmascript.pages.academy/big-trip/points`;
+const URL_BIGTRIP_DESTINATIONS = `https://13.ecmascript.pages.academy/big-trip/destinations`;
+const URL_BIGTRIP_OFFERS = `https://11.ecmascript.pages.academy/big-trip/offers`;
+
+import API from "./api.js";
+const api = new API(URL_BIGTRIP_OFFERS, AUTHORIZATION);
+
+api.getTasks().then((tasks) => console.log(tasks));
