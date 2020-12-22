@@ -19,14 +19,15 @@ export default class Header {
   render(points) {
     const container = this._container.getElement();
 
+    const containerPageHeaderElement = container.querySelector(`.page-header__container`);
+    render(containerPageHeaderElement, this._controlsMenuView);
+
+    const containerTripControlsElement = container.querySelector(`.trip-controls`);
+    const filterController = new FilterController(containerTripControlsElement, this._pointsModel);
+    filterController.render();
+
     const containerTripInfoElement = container.querySelector(`.trip-info`);
     render(containerTripInfoElement, new TripCostView(points));
-
-    const containerContolsElement = container.querySelector(`.trip-controls`);
-    render(containerContolsElement, this._controlsMenuView);
-    // render(containerContolsElement, this._filterView);
-    const filterController = new FilterController(containerContolsElement, this._pointsModel);
-    filterController.render();
 
     if (points.length === 0) {
       return;
