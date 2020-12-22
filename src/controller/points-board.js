@@ -42,6 +42,7 @@ export default class PointsBoard {
     this._noPoinstView = new NoPointsView();
     this._sortView = new SortView();
     this._tripListView = new TripListView();
+    this._creatingPoint = null;
 
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
@@ -65,6 +66,17 @@ export default class PointsBoard {
     render(container, this._tripListView);
 
     this._renderPoints(points);
+  }
+
+  createPoint() {
+    if (this._creatingPoint) {
+      return;
+    }
+
+    const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
+
+    this._creatingPoint = new PointController(tripList, this._onDataChange, this._onViewChange);
+    this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
   }
 
   _removePoints() {
@@ -98,7 +110,7 @@ export default class PointsBoard {
         pointController.destroy();
         this._updatePoints();
       } else {
-        this._pointsModel.addTask(newData);
+        this._pointsModel.addPoint(newData);
         pointController.render(newData, PointControllerMode.DEFAULT);
 
         this._showedPointControllers = [].concat(pointController, this._showedPointControllers);

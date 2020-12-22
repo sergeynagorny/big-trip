@@ -3,11 +3,24 @@ import PointEditView from "../view/point-edit.js";
 import {render, remove, replace} from "../utils/render.js";
 
 export const Mode = {
+  ADDING: `adding`,
   DEFAULT: `default`,
   EDIT: `edit`,
 };
 
-export const EmptyPoint = {};
+export const EmptyPoint = {
+  destination: `Geneva`,
+  date: {
+    start: new Date(),
+    end: new Date(),
+  },
+  type: `bus`,
+  price: `500`,
+  typeInfo: {
+    offers: [],
+  },
+  isFavorite: false,
+};
 
 export default class PointController {
   constructor(container, onDataChange, onViewChange) {
@@ -34,12 +47,23 @@ export default class PointController {
     this._pointEditView = new PointEditView(this._point);
     this._setupEventHandlers();
 
-    if (oldPointView && oldPointEditView) {
-      replace(this._pointView, oldPointView);
-      replace(this._pointEditView, oldPointEditView);
-      this._replaceEditToPoint();
-    } else {
-      render(this._container, this._pointView);
+    switch (mode) {
+      case Mode.DEFAULT:
+        if (oldPointView && oldPointEditView) {
+          replace(this._pointView, oldPointView);
+          replace(this._pointEditView, oldPointEditView);
+          this._replaceEditToPoint();
+        } else {
+          render(this._container, this._pointView);
+        }
+        break;
+      case Mode.ADDING:
+        if (oldPointView && oldPointEditView) {
+          remove(oldPointView);
+          remove(oldPointEditView);
+        }
+        document.addEventListener(`keydown`, this._onEscKeyDown);
+        render(this._container, this._pointEditView, `afterbegin`);
     }
   }
 
@@ -99,6 +123,10 @@ export default class PointController {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
 
     if (isEscKey) {
+
+      // if (this._mode === Mode.ADDING) {
+      //   this._onDataChange(this, EmptyPoint, null);
+      // }
       this._replaceEditToPoint();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }
