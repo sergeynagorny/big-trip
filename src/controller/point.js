@@ -1,6 +1,10 @@
+import PointModel from "../model/point.js"; // Единичный поинт, а не общий
+
 import PointView from "../view/point.js";
 import PointEditView from "../view/point-edit.js";
+
 import {render, remove, replace} from "../utils/render.js";
+
 
 export const Mode = {
   ADDING: `adding`,
@@ -14,23 +18,50 @@ export const EmptyPoint = {
     start: new Date(),
     end: new Date(),
   },
-  type: `bus`,
-  price: `500`,
+  type: `taxi`,
+  price: 0,
   typeInfo: {
     offers: [],
   },
   isFavorite: false,
 };
 
+const parseFormData = (formData, destinations) => {
+  const city = document.querySelector(`#event-destination-1`).value;
+  const selectedOffers = Array.from(document.querySelectorAll(
+      `.event__offer-checkbox:checked + label[for^="event"]`));
+
+  return new PointModel({
+    'type': formData.get(`event-type`),
+    'date_from': formData.get(`event-start-time`),
+    'date_to': formData.get(`event-end-time`),
+    'destination': {
+      'name': destinations[city].name,
+      'description': destinations[city].description,
+      'pictures': destinations[city].pictures
+    },
+    'base_price': Number(formData.get(`event-price`)),
+    'is_favorite': Boolean(formData.get(`event-favorite`)),
+    'offers': selectedOffers.map((offer) => ({
+      'title': offer.querySelector(`.event__offer-title`).textContent,
+      'price': Number(offer.querySelector(`.event__offer-price`).textContent)
+    })),
+  });
+};
+
 export default class PointController {
-  constructor(container, onDataChange, onViewChange) {
+  constructor(container, onDataChange, onViewChange, destinations, offers) {
     this._container = container;
+    this._destinations = destinations;
+    this._offers = offers;
+
+    this._onDataChange = onDataChange;
+    this._onViewChange = onViewChange;
 
     this._point = null;
     this._pointView = null;
     this._pointEditView = null;
-    this._onDataChange = onDataChange;
-    this._onViewChange = onViewChange;
+
     this._mode = Mode.DEFAULT;
 
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
@@ -81,6 +112,7 @@ export default class PointController {
 
   _setupEventHandlers() {
     this._pointView.setEditButtonClickHandler(() => {
+      document.addEventListener(`keydown`, this._onEscKeyDown);
       this._replacePointToEdit();
     });
 
@@ -101,18 +133,17 @@ export default class PointController {
     });
   }
 
-  _replacePointToEdit() {
-    this._onViewChange(); // при открытии любого, закрывает все остальные, кто имеет флаг ЭДИТ.
+  _replacePointToEdit() { // +
+    this._onViewChange();
     replace(this._pointEditView, this._pointView);
     this._mode = Mode.EDIT;
-    document.addEventListener(`keydown`, this._onEscKeyDown);
   }
 
-  _replaceEditToPoint() {
+  _replaceEditToPoint() { // +-
     document.removeEventListener(`keydown`, this._onEscKeyDown);
-    this._pointEditView.reset(); // при закрытии, сбрасывает данные до дефолта
+    this._pointEditView.reset();
 
-    if (document.contains(this._pointEditView.getElement())) {
+    if (document.contains(this._pointEditView.getElement())) { // можно попробовать убрать этот IF
       replace(this._pointView, this._pointEditView);
     }
 
@@ -123,10 +154,10 @@ export default class PointController {
     const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
 
     if (isEscKey) {
+      if (this._mode === Mode.ADDING) {
+        this._onDataChange(this, EmptyPoint, null);
+      }
 
-      // if (this._mode === Mode.ADDING) {
-      //   this._onDataChange(this, EmptyPoint, null);
-      // }
       this._replaceEditToPoint();
       document.removeEventListener(`keydown`, this._onEscKeyDown);
     }

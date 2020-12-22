@@ -4,6 +4,9 @@ import {getPointsByFilter} from "../utils/filter.js";
 export default class Points {
   constructor() {
     this._points = [];
+    this._destinations = [];
+    this._offers = [];
+
     this._activeFilterType = FilterType.EVERYTHING;
 
     this._dataChangeHandlers = [];
@@ -11,22 +14,51 @@ export default class Points {
   }
 
 
+  // GETTERS
+
   getPoints() {
     return getPointsByFilter(this._points, this._activeFilterType);
+  }
+
+  getDestinations() {
+    return this._destinations;
+  }
+
+  getOffers() {
+    return this._offers;
   }
 
   getPointsAll() {
     return this._points;
   }
 
+
+  // SETTERS
+
   setPoints(points) {
     this._points = Array.from(points);
     this._callHandlers(this._dataChangeHandlers);
   }
 
+  setDestinations(destinations) {
+    this._destinations = destinations;
+  }
+
+  setOffers(offers) {
+    this._offers = offers;
+  }
+
   setFilter(filterType) {
     this._activeFilterType = filterType;
     this._callHandlers(this._filterChangeHandlers);
+  }
+
+
+  // ADD, REMOVE, UPDATE
+
+  addPoint(point) {
+    this._points = [].concat(point, this._points);
+    this._callHandlers(this._dataChangeHandlers);
   }
 
   removePoint(id) {
@@ -43,11 +75,6 @@ export default class Points {
     return true;
   }
 
-  addPoint(point) {
-    this._points = [].concat(point, this._points);
-    this._callHandlers(this._dataChangeHandlers);
-  }
-
   updatePoint(id, point) {
     const index = this._points.findIndex((it) => it.id === id);
 
@@ -61,6 +88,9 @@ export default class Points {
 
     return true;
   }
+
+
+  // CHANGE HANDLERS
 
   setFilterChangeHandler(handler) {
     this._filterChangeHandlers.push(handler);

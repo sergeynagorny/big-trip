@@ -189,10 +189,13 @@ const createPointEditTemplate = (point, options = {}) => {
 
 
 export default class PointEdit extends AbstractSmart {
-  constructor(point) {
+  constructor(point, destinations, offers) {
     super();
 
     this._point = point;
+    this._destinations = destinations;
+    this._offers = offers;
+
     this._submitHandler = null;
     this._deleteButtonClickHandler = null;
 
@@ -282,7 +285,6 @@ export default class PointEdit extends AbstractSmart {
     const eventStartInput = pointEdit.querySelector(`input[name="event-start-time"]`);
     const eventEndInput = pointEdit.querySelector(`input[name="event-end-time"]`);
     const availableOffers = pointEdit.querySelector(`.event__available-offers`);
-    const priceInput = pointEdit.querySelector(`.event__input--price`);
 
     eventStartInput.addEventListener(`click`, () => {
       this._eventStart = eventStartInput.value;
@@ -302,11 +304,6 @@ export default class PointEdit extends AbstractSmart {
 
     destinationInput.addEventListener(`change`, () => {
       this._destination = destinationInput.value;
-      this.rerender();
-    });
-
-    priceInput.addEventListener(`change`, () => {
-      this._price = priceInput.value;
       this.rerender();
     });
 
