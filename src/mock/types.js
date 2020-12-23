@@ -19,6 +19,7 @@ const OfferTitles = [
   `Order Uber`,
 ];
 
+
 const generateTypeOffers = () => {
   const offers = [];
 
@@ -49,3 +50,16 @@ export const generatePointTypes = () => {
 };
 
 export const TYPE = generatePointTypes();
+
+const generateOffers = () => {
+  const typesName = [`taxi`, `bus`, `train`, `ship`, `transport`, `drive`, `flight`, `check-in`, `sightseeing`, `restaurant`];
+
+  return typesName.map((it) => {
+    return {
+      type: it,
+      offers: generateTypeOffers(),
+    };
+  });
+};
+
+export const OFFERS = generateOffers();

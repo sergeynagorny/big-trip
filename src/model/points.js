@@ -1,4 +1,5 @@
 import {FilterType} from "../const.js";
+import {createDestinationMap, createTypeOffersMap} from "../utils/common.js";
 import {getPointsByFilter} from "../utils/filter.js";
 
 export default class Points {
@@ -11,6 +12,26 @@ export default class Points {
 
     this._dataChangeHandlers = [];
     this._filterChangeHandlers = [];
+  }
+
+  // SETTERS
+
+  setPoints(points) {
+    this._points = Array.from(points);
+    this._callHandlers(this._dataChangeHandlers);
+  }
+
+  setDestinations(destinations) {
+    this._destinations = createDestinationMap(destinations);
+  }
+
+  setOffers(offers) {
+    this._offers = createTypeOffersMap(offers);
+  }
+
+  setFilter(filterType) {
+    this._activeFilterType = filterType;
+    this._callHandlers(this._filterChangeHandlers);
   }
 
 
@@ -30,27 +51,6 @@ export default class Points {
 
   getPointsAll() {
     return this._points;
-  }
-
-
-  // SETTERS
-
-  setPoints(points) {
-    this._points = Array.from(points);
-    this._callHandlers(this._dataChangeHandlers);
-  }
-
-  setDestinations(destinations) {
-    this._destinations = destinations;
-  }
-
-  setOffers(offers) {
-    this._offers = offers;
-  }
-
-  setFilter(filterType) {
-    this._activeFilterType = filterType;
-    this._callHandlers(this._filterChangeHandlers);
   }
 
 

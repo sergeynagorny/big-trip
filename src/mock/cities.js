@@ -1,8 +1,15 @@
 import {getRandomIntegerNumber} from '../utils/common.js';
 
+// {
+//   name: `Saint Petersburg`,
+//     description: `Amsterdam, is a beautiful city, in a middle of Europe, with a beautiful old town, middle-eastern paradise.`,
+//       pictures: [
+//         { src: `arbuz.jpg`, description: `helsink park` }
+//       ]
+// },
 
 export const City = {
-  names: [`Amsterdam`, `Geneva`, `Chamonix`],
+  names: [`Amsterdam`, `Geneva`, `Chamonix`, `Saint Petersburg`, `Moscow`],
   descriptions: [
     `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
     `Sed tempus urna et pharetra pharetra.Mattis enim ut tellus elementum sagittis vitae.`,
@@ -33,13 +40,13 @@ export const getRandomCityDescription = () => {
 };
 
 export const generateCities = () => {
-  return City.names.reduce((acc, city) => {
-    acc[city] = {
+  return City.names.map((it) => {
+    return {
+      name: it,
       description: getRandomCityDescription(),
       pictures: getRandomCityPictures(),
     };
-    return acc;
-  }, {});
+  });
 };
 
 export const CITY = generateCities();

@@ -1,6 +1,12 @@
-import {getRandomArrayItem, getRandomIntegerNumber} from '../utils/common.js';
+import {getRandomArrayItem, getRandomIntegerNumber, createDestinationMap, createTypeOffersMap} from '../utils/common.js';
 import {CITY} from "./cities.js";
 import {TYPE} from "./types.js";
+import {OFFERS} from "./types.js";
+
+
+const destinationMap = createDestinationMap(CITY);
+const typeOffersMap = createTypeOffersMap(OFFERS);
+
 
 const getRandomDate = () => {
   const dateStart = new Date();
@@ -18,8 +24,8 @@ const getRandomDate = () => {
   dateEnd.setMinutes(dateStart.getMinutes() + randomMinutes);
 
   return {
-    start: dateStart,
-    end: dateEnd
+    checkIn: dateStart,
+    checkOut: dateEnd
   };
 };
 
@@ -29,32 +35,36 @@ const getRandomOffers = (offers) => {
   });
 };
 
-const generateOffers = (array) => {
-  return array.map((it) => {
-    return Object.assign({}, it, {isActive: Boolean(getRandomIntegerNumber(0, 2))});
-  });
+const generateActiveOffers = (data) => {
+  return Object.fromEntries(Object.entries(data).filter(() => {
+    return Boolean(getRandomIntegerNumber(0, 2));
+  }));
 };
 
 
 export const generatePoint = () => {
-  const destination = getRandomArrayItem(Object.keys(CITY));
-  const type = getRandomArrayItem(Object.keys(TYPE));
+  const destination = getRandomArrayItem(Object.keys(destinationMap));
+  const type = getRandomArrayItem(Object.keys(typeOffersMap));
 
   return {
     id: String(new Date() + Math.random()),
     type,
-    destination,
+    destination: {
+      name: destinationMap[destination].name,
+      description: destinationMap[destination].description,
+      pictures: destinationMap[destination].pictures,
+    },
+    date: getRandomDate(),
     price: getRandomIntegerNumber(1, 50) * 5,
-    destinationInfo: CITY[destination],
-    energy: generateOffers(TYPE[type].offers),
+    offers: generateActiveOffers(typeOffersMap[type].offers),
+    isFavorite: Boolean(getRandomIntegerNumber(0, 2)),
     typeInfo: {
       offers: getRandomOffers(TYPE[type].offers),
-    },
-    isFavorite: Boolean(getRandomIntegerNumber(0, 2)),
-    date: getRandomDate(),
+    }
   };
 };
 
+
 export const generatePoints = (count) => {
-  return new Array(count).fill(``).map(generatePoint).sort((left, right) => left.date.start - right.date.start);
+  return new Array(count).fill(``).map(generatePoint).sort((left, right) => left.date.checkIn - right.date.checkIn);
 };

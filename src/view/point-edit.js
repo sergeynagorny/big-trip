@@ -128,7 +128,9 @@ const formatInputTime = (time) => {
 // TODO: datalist
 
 const createPointEditTemplate = (point, options = {}) => {
-  const {destinationInfo, price, destination, type, typeInfo: {offers: activeOffers}} = options;
+  const {destinationInfo, price, type, typeInfo: {offers: activeOffers}} = options;
+
+  const destination = point.destination.name;
 
   const dateStart = formatInputTime(point.date.start);
   const dateEnd = formatInputTime(point.date.end);

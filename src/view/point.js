@@ -1,7 +1,6 @@
 import Abstract from "./abstract.js";
-import {capitalizeFirstLetter} from '../utils/common.js';
-import {TYPE} from "../mock/types.js";
-import {prepositionsMap} from '../const.js';
+import {capitalizeFirstLetter, formatTypesGroup} from '../utils/common.js';
+
 
 const castTimeFormat = (value) => {
   return value < 10 ? `0${value}` : String(value);
@@ -18,8 +17,8 @@ const setTimeUnitFormat = (unit, symbol) => {
   return unit.toString().padStart(2, `0`) + `${symbol} `;
 };
 
-function calculateEventDuration(time) {
-  const ms = time.end - time.start;
+function calculateEventDuration(checkIn, checkOut) {
+  const ms = checkOut - checkIn;
 
   let days = Math.floor(ms / (24 * 60 * 60 * 1000));
   let hours = Math.floor((ms % (24 * 60 * 60 * 1000)) / (60 * 60 * 1000));
@@ -32,12 +31,8 @@ function calculateEventDuration(time) {
   return `${days}${hours}${minutes}`;
 }
 
-const calculateOffersPrice = (offers) => {
-  return offers.reduce((acc, it) => acc + it.price, 0);
-};
-
 const createOffersMarkup = (offers) => {
-  return offers.slice(0, 3).map((offer) => {
+  return Object.values(offers).slice(0, 3).map((offer) => {
     return (`
         <li class="event__offer">
           <span class="event__offer-title">${offer.title}</span>&nbsp;&plus;&nbsp;&euro;
@@ -48,38 +43,30 @@ const createOffersMarkup = (offers) => {
 };
 
 const createPointTemplate = (point) => {
+  const {destination: {name}, date: {checkIn, checkOut}, price, type, offers} = point;
 
-  const city = point.destination;
-  const preposition = prepositionsMap[TYPE[point.type].type];
-  const pointType = point.type;
-  const dateStart = point.date.start;
-  const dateEnd = point.date.end;
-  const eventDuration = calculateEventDuration(point.date);
-  const fullPrice = calculateOffersPrice(point.typeInfo.offers) + point.price;
-
+  const offersMarkup = createOffersMarkup(offers);
   const isFavorite = point.isFavorite ? `event__favorite-btn--active` : ``;
-
-  const offersMarkup = createOffersMarkup(point.typeInfo.offers);
 
   return (`
     <li class="trip-events__item">
       <div class="event">
         <div class="event__type">
-          <img class="event__type-icon" width="42" height="42" src="img/icons/${pointType}.png" alt="Event type icon">
+          <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event type icon">
         </div>
-        <h3 class="event__title">${capitalizeFirstLetter(pointType)} ${preposition} ${city}</h3>
+        <h3 class="event__title">${capitalizeFirstLetter(type)} ${formatTypesGroup(type)} ${name}</h3>
 
         <div class="event__schedule">
           <p class="event__time">
-            <time class="event__start-time" datetime="${dateStart}">${formatTime(dateStart)}</time>
+            <time class="event__start-time" datetime="${checkIn}">${formatTime(checkIn)}</time>
             &mdash;
-            <time class="event__end-time" datetime="${dateEnd}">${formatTime(dateEnd)}</time>
+            <time class="event__end-time" datetime="${checkOut}">${formatTime(checkOut)}</time>
           </p>
-          <p class="event__duration">${eventDuration}</p>
+          <p class="event__duration">${calculateEventDuration(checkIn, checkOut)}</p>
         </div>
 
         <p class="event__price">
-          &euro;&nbsp;<span class="event__price-value">${fullPrice}</span>
+          &euro;&nbsp;<span class="event__price-value">${price}</span>
         </p>
 
         <h4 class="visually-hidden">Offers:</h4>
