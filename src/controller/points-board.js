@@ -23,9 +23,9 @@ const getSortedPoints = (points, sortType) => {
   return sortedPoints;
 };
 
-const renderPoints = (container, points, onDataChange, onViewChange) => {
+const renderPoints = (container, points, destinations, offers, onDataChange, onViewChange) => {
   return points.map((point) => {
-    const pointController = new PointController(container, onDataChange, onViewChange);
+    const pointController = new PointController(container, destinations, offers, onDataChange, onViewChange);
     pointController.render(point, PointControllerMode.DEFAULT);
 
     return pointController;
@@ -37,6 +37,8 @@ export default class PointsBoard {
   constructor(container, pointsModel) {
     this._container = container;
     this._pointsModel = pointsModel;
+    this._destinations = pointsModel.getDestinations();
+    this._offers = pointsModel.getOffers();
 
     this._showedPointControllers = [];
     this._noPoinstView = new NoPointsView();
@@ -57,6 +59,7 @@ export default class PointsBoard {
     const container = this._container.getElement();
     const points = this._pointsModel.getPoints();
 
+
     if (points.length === 0) {
       render(container, this._noPoinstView);
       return;
@@ -75,7 +78,7 @@ export default class PointsBoard {
 
     const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
 
-    this._creatingPoint = new PointController(tripList, this._onDataChange, this._onViewChange);
+    this._creatingPoint = new PointController(tripList, this._destinations, this._offers, this._onDataChange, this._onViewChange);
     this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
   }
 
@@ -86,7 +89,7 @@ export default class PointsBoard {
 
   _renderPoints(points) {
     const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
-    this._showedPointControllers = renderPoints(tripList, points, this._onDataChange, this._onViewChange);
+    this._showedPointControllers = renderPoints(tripList, points, this._destinations, this._offers, this._onDataChange, this._onViewChange);
   }
 
   _updatePoints() {

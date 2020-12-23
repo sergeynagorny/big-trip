@@ -50,7 +50,7 @@ const parseFormData = (formData, destinations) => {
 };
 
 export default class PointController {
-  constructor(container, onDataChange, onViewChange, destinations, offers) {
+  constructor(container, destinations, offers, onDataChange, onViewChange) {
     this._container = container;
     this._destinations = destinations;
     this._offers = offers;
@@ -74,8 +74,8 @@ export default class PointController {
     const oldPointView = this._pointView;
     const oldPointEditView = this._pointEditView;
 
-    this._pointView = new PointView(this._point);
-    this._pointEditView = new PointEditView(this._point);
+    this._pointView = new PointView(this._point, this._destinations, this._offers);
+    this._pointEditView = new PointEditView(this._point, this._destinations, this._offers);
     this._setupEventHandlers();
 
     switch (mode) {

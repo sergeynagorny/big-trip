@@ -15,7 +15,6 @@ const boardContainer = document.querySelector(`.page-body__container`);
 const POINTS_COUNT = 10;
 const dataPoints = generatePoints(POINTS_COUNT);
 
-console.log(dataPoints);
 
 const pointsModel = new PointsModel();
 pointsModel.setPoints(dataPoints);

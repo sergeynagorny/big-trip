@@ -58,9 +58,6 @@ export const generatePoint = () => {
     price: getRandomIntegerNumber(1, 50) * 5,
     offers: generateActiveOffers(typeOffersMap[type].offers),
     isFavorite: Boolean(getRandomIntegerNumber(0, 2)),
-    typeInfo: {
-      offers: getRandomOffers(TYPE[type].offers),
-    }
   };
 };
 
