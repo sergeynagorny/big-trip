@@ -1,6 +1,5 @@
 import {getRandomArrayItem, getRandomIntegerNumber, createDestinationMap, createTypeOffersMap} from '../utils/common.js';
 import {CITY} from "./cities.js";
-import {TYPE} from "./types.js";
 import {OFFERS} from "./types.js";
 
 
@@ -27,12 +26,6 @@ const getRandomDate = () => {
     checkIn: dateStart,
     checkOut: dateEnd
   };
-};
-
-const getRandomOffers = (offers) => {
-  return offers.filter(function () {
-    return getRandomIntegerNumber(0, 2);
-  });
 };
 
 const generateActiveOffers = (data) => {

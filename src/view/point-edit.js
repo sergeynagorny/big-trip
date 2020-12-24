@@ -1,52 +1,28 @@
 import AbstractSmart from "./abstract-smart.js";
-import {capitalizeFirstLetter, formatTypesGroup, createTypeOffersMap} from '../utils/common.js';
-import {OFFERS} from "../mock/types.js";
+import {capitalizeFirstLetter, formatTypesGroup} from '../utils/common.js';
 import dayjs from 'dayjs';
 
 
-const typeOffersMap = createTypeOffersMap(OFFERS);
+const parseFormData = (formData, destinationMap, offersMap) => {
+  const destinationInput = formData.get(`event-destination`);
+  const type = formData.get(`event-type`);
 
-// const parseFormData = (formData) => {
-//   const destination = formData.get(`event-destination`);
-//   const type = formData.get(`event-type`);
-//   const offers = formData.getAll(`event-offer`).map((it) => {
-//     const element = document.querySelector(`input[value="${it}"]`);
-//     return {
-//       title: it,
-//       price: element.dataset.price,
-//     };
-//   });
-
-//   return {
-//     destination,
-//     destinationInfo: CITY[destination],
-//     price: formData.get(`event-price`),
-//     type,
-//     typeInfo: {
-//       offers,
-//     },
-//     date: {
-//       start: new Date(),
-//       end: new Date(),
-//     },
-//     // date: {
-//     //   start: formData.get(`event-start-time`),
-//     //   end: formData.get(`event-end-time`),
-//     // },
-//   };
-// };
-
-export const createDestinationMap = (data) => {
-  return data.reduce((acc, item) => {
-    const itemKey = item.name.toLowerCase().replace(/ /g, `-`);
-
-    acc[itemKey] = {
-      name: item.name,
-      description: item.description,
-      pictures: item.pictures,
-    };
+  const selectedOffers = Array.from(document.querySelectorAll(`.event__offer-checkbox:checked`));
+  const offers = selectedOffers.reduce((acc, item) => {
+    acc[item.value] = offersMap[type].offers[item.value];
     return acc;
   }, {});
+
+  return {
+    destination: destinationMap[destinationInput.toLowerCase()] || {name: destinationInput},
+    price: Number(formData.get(`event-price`)),
+    type,
+    offers,
+    date: {
+      checkIn: new Date(),
+      checkOut: new Date(),
+    },
+  };
 };
 
 const createPointTypeListMarkup = (activeType, data) => {
@@ -88,7 +64,7 @@ const createOffersMarkup = (allOffers, activeOffers) => {
 
     return (`
       <div class="event__offer-selector">
-        <input class="event__offer-checkbox visually-hidden" value="${offer.title}" id="${offerId}" type="checkbox" name="event-offer" ${isChecked}>
+        <input class="event__offer-checkbox visually-hidden" value="${key}" id="${offerId}" type="checkbox" name="event-offer" ${isChecked}>
         <label class="event__offer-label" for="${offerId}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;
@@ -272,7 +248,7 @@ export default class PointEdit extends AbstractSmart {
     const form = this.getElement();
     const formData = new FormData(form);
 
-    return parseFormData(formData);
+    return parseFormData(formData, this._destinations, this._offers);
   }
 
   setSubmitHandler(handler) {
