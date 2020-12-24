@@ -1,13 +1,5 @@
 import {getRandomIntegerNumber} from '../utils/common.js';
 
-// {
-//   name: `Saint Petersburg`,
-//     description: `Amsterdam, is a beautiful city, in a middle of Europe, with a beautiful old town, middle-eastern paradise.`,
-//       pictures: [
-//         { src: `arbuz.jpg`, description: `helsink park` }
-//       ]
-// },
-
 export const City = {
   names: [`Amsterdam`, `Geneva`, `Chamonix`],
   descriptions: [
