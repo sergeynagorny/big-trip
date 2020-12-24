@@ -13,7 +13,7 @@ const getSortedPoints = (points, sortType) => {
       sortedPoints = points;
       break;
     case SortType.TIME:
-      sortedPoints = points.slice().sort((a, b) => (b.date.end - b.date.start) - (a.date.end - a.date.start));
+      sortedPoints = points.slice().sort((a, b) => (b.date.checkOut - b.date.checkIn) - (a.date.checkOut - a.date.checkIn));
       break;
     case SortType.PRICE:
       sortedPoints = points.slice().sort((a, b) => b.price - a.price);

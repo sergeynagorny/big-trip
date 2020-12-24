@@ -7,9 +7,9 @@ export const getPointsByFilter = (points, filterType) => {
     case FilterType.EVERYTHING:
       return points;
     case FilterType.FUTURE:
-      return points.filter((it) => it.date.end > nowDate);
+      return points.filter((it) => it.date.checkOut > nowDate);
     case FilterType.PAST:
-      return points.filter((it) => it.date.end < nowDate);
+      return points.filter((it) => it.date.checkOut < nowDate);
 
   }
 
