@@ -1,4 +1,5 @@
 import Abstract from "./abstract.js";
+import moment from "moment";
 
 const calculateFullPrice = (points) => {
   return points.reduce((acc, item) => {
@@ -28,14 +29,17 @@ const getPointsDates = (points) => {
     return ``;
   }
 
-  const firstDate = points[0].date.checkIn;
-  const lastDate = points[points.length - 1].date.checkOut;
+  const firstDate = moment(points[0].date.checkIn);
+  const lastDate = moment(points[points.length - 1].date.checkOut);
 
-  const formatFirstDate = `${firstDate.getUTCMonth()} ${firstDate.getUTCDate()}`;
-  const formatLastDate = firstDate.getUTCMonth() === lastDate.getUTCMonth() ? `${lastDate.getUTCDate()}` : `${lastDate.getUTCMonth()} ${lastDate.getUTCDate()}`;
-
-
-  return `${formatFirstDate} — ${formatLastDate}`;
+  if (firstDate.month() === lastDate.month()) {
+    if (firstDate.dayOfYear() === lastDate.dayOfYear()) {
+      return `${firstDate.format(`MMM DD`)}`;
+    }
+    return `${firstDate.format(`MMM DD`)} — ${lastDate.format(`DD`)}`;
+  } else {
+    return `${firstDate.format(`MMM DD`)} — ${lastDate.format(`MMM DD`)}`;
+  }
 };
 
 const createPointsInfoTemplate = (points) => {
