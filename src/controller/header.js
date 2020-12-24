@@ -1,8 +1,4 @@
-import TripRouteView from "../view/trip-route.js";
-import TripDatesView from "../view/trip-dates.js";
-import TripCostView from "../view/trip-cost.js";
-import ControlsMenuView from "../view/controls-menu.js";
-import FilterView from "../view/filter.js";
+import PointsInfoController from "../controller/points-info.js";
 import FilterController from "../controller/filter.js";
 import {render} from "../utils/render.js";
 
@@ -12,29 +8,19 @@ export default class Header {
     this._container = container;
     this._pointsModel = pointsModel;
 
-    this._controlsMenuView = new ControlsMenuView();
-    this._filterView = new FilterView();
+    this._filterController = null;
+    this._pointsInfoController = null;
   }
 
-  render(points) {
+  render() {
     const container = this._container.getElement();
 
-    const containerPageHeaderElement = container.querySelector(`.page-header__container`);
-    render(containerPageHeaderElement, this._controlsMenuView);
+    const containerPointsInfo = container.querySelector(`.trip-main`);
+    this._pointsInfoController = new PointsInfoController(containerPointsInfo, this._pointsModel);
+    this._pointsInfoController.render();
 
-    const containerTripControlsElement = container.querySelector(`.trip-controls`);
-    const filterController = new FilterController(containerTripControlsElement, this._pointsModel);
-    filterController.render();
-
-    const containerTripInfoElement = container.querySelector(`.trip-info`);
-    render(containerTripInfoElement, new TripCostView(points));
-
-    if (points.length === 0) {
-      return;
-    }
-
-    const containerTripRouteAndDateElement = container.querySelector(`.trip-info__route-and-date`);
-    render(containerTripRouteAndDateElement, new TripRouteView(points));
-    render(containerTripRouteAndDateElement, new TripDatesView(points));
+    const containerTripControls = container.querySelector(`.trip-controls`);
+    this._filterController = new FilterController(containerTripControls, this._pointsModel);
+    this._filterController.render();
   }
 }

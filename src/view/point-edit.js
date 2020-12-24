@@ -129,9 +129,10 @@ const createDestinationList = (destinations) => {
 };
 
 const createPointEditTemplate = (point, options = {}, destinationsData, offersData) => {
-  const {date: {checkIn, checkOut}, price} = point;
+  const {date: {checkIn, checkOut}, price, id} = point;
   const {type, offers, destination: {name, description, pictures}} = options;
 
+  const resetButtonName = id ? `Delete` : `Cancel`;
   const typeOffers = offersData[type].offers;
   const destinationListMarkup = createDestinationList(destinationsData);
   const typeListMarkup = createPointTypeListMarkup(type, offersData);
@@ -176,7 +177,7 @@ const createPointEditTemplate = (point, options = {}, destinationsData, offersDa
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-        <button class="event__reset-btn" type="reset">Cancel</button>
+        <button class="event__reset-btn" type="reset">${resetButtonName}</button>
       </header>
       ${(offersMarkup || infoMarkup) ? `<section class="event__details">${offersMarkup} ${infoMarkup}</section>` : ``}
     </form>

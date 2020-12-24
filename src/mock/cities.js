@@ -9,7 +9,7 @@ import {getRandomIntegerNumber} from '../utils/common.js';
 // },
 
 export const City = {
-  names: [`Amsterdam`, `Geneva`, `Chamonix`, `Saint Petersburg`, `Moscow`],
+  names: [`Amsterdam`, `Geneva`, `Chamonix`],
   descriptions: [
     `Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.`,
     `Sed tempus urna et pharetra pharetra.Mattis enim ut tellus elementum sagittis vitae.`,

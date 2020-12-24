@@ -24,7 +24,7 @@ pointsModel.setOffers(OFFERS);
 
 const headerView = new HeaderView();
 const headerController = new HeaderController(headerView, pointsModel);
-// headerController.render(dataPoints);
+headerController.render();
 render(body, headerView, `afterbegin`);
 
 const pointsBoardView = new PointsBoardView();

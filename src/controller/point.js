@@ -13,16 +13,15 @@ export const Mode = {
 };
 
 export const EmptyPoint = {
-  destination: `Geneva`,
+  destination: {
+    name: ``,
+  },
   date: {
-    start: new Date(),
-    end: new Date(),
+    checkIn: new Date(),
+    checkOut: new Date(),
   },
   type: `taxi`,
   price: 0,
-  typeInfo: {
-    offers: [],
-  },
   isFavorite: false,
 };
 
