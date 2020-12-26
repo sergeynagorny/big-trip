@@ -12,7 +12,7 @@ import {render} from "./utils/render.js";
 const body = document.querySelector(`body`);
 const boardContainer = document.querySelector(`.page-body__container`);
 
-const POINTS_COUNT = 10;
+const POINTS_COUNT = 5;
 const dataPoints = generatePoints(POINTS_COUNT);
 
 
@@ -22,16 +22,15 @@ pointsModel.setDestinations(CITY);
 pointsModel.setOffers(OFFERS);
 
 
-const headerView = new HeaderView();
-const headerController = new HeaderController(headerView, pointsModel);
-headerController.render();
-render(body, headerView, `afterbegin`);
-
 const pointsBoardView = new PointsBoardView();
 render(boardContainer, pointsBoardView);
 const pointsBoardController = new PointsBoardController(pointsBoardView, pointsModel);
 pointsBoardController.render();
 
+const headerView = new HeaderView();
+const headerController = new HeaderController(headerView, pointsBoardController, pointsModel);
+headerController.render();
+render(body, headerView, `afterbegin`);
 
 // ============================== ХУЕТА
 

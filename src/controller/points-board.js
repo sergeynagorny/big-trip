@@ -1,8 +1,9 @@
 import TripListView from "../view/trip-list.js";
+import PointsListView from "../view/points-list.js";
 import NoPointsView from "../view/no-points.js";
 import SortView, {SortType} from "../view/sort.js";
-import {render} from "../utils/render.js";
 import PointController, {Mode as PointControllerMode, EmptyPoint} from "./point.js";
+import {render} from "../utils/render.js";
 
 
 const getSortedPoints = (points, sortType) => {
@@ -10,7 +11,7 @@ const getSortedPoints = (points, sortType) => {
 
   switch (sortType) {
     case SortType.EVENT:
-      sortedPoints = points;
+      sortedPoints = points.slice().sort((a, b) => a.date.checkIn - b.date.checkIn);
       break;
     case SortType.TIME:
       sortedPoints = points.slice().sort((a, b) => (b.date.checkOut - b.date.checkIn) - (a.date.checkOut - a.date.checkIn));
@@ -23,27 +24,64 @@ const getSortedPoints = (points, sortType) => {
   return sortedPoints;
 };
 
-const renderPoints = (container, points, destinations, offers, onDataChange, onViewChange) => {
-  return points.map((point) => {
-    const pointController = new PointController(container, destinations, offers, onDataChange, onViewChange);
-    pointController.render(point, PointControllerMode.DEFAULT);
+const renderPoints = (container, points, destinations, offers, onDataChange, onViewChange, defaultSortType = true) => {
+  let allControllers = [];
 
-    return pointController;
-  });
+  if (defaultSortType) {
+    const dates = getTripDates(points);
+
+    dates.forEach((date, index) => {
+      const pointsListView = new PointsListView(date, index + 1);
+      const pointContainer = pointsListView.getPointsContainer();
+      render(container, pointsListView);
+
+      const newControllers = points
+        .filter((point) => {
+          return new Date(point.date.checkIn).toDateString() === date;
+        })
+        .map((point) => {
+          const pointController = new PointController(pointContainer, destinations, offers, onDataChange, onViewChange);
+          pointController.render(point, PointControllerMode.DEFAULT);
+
+          return pointController;
+        });
+
+      allControllers = [].concat(allControllers, newControllers);
+    });
+
+    return allControllers;
+  } else {
+    const pointsListView = new PointsListView();
+    const pointContainer = pointsListView.getPointsContainer();
+    render(container, pointsListView);
+
+    allControllers = points.map((point) => {
+      const pointController = new PointController(pointContainer, destinations, offers, onDataChange, onViewChange);
+      pointController.render(point, PointControllerMode.DEFAULT);
+
+      return pointController;
+    });
+
+    return allControllers;
+  }
 };
 
+const getTripDates = (points) => {
+  return Array.from(new Set(points.map((point) => new Date(point.date.checkIn).toDateString())));
+};
 
 export default class PointsBoard {
   constructor(container, pointsModel) {
     this._container = container;
     this._pointsModel = pointsModel;
-    this._destinations = pointsModel.getDestinations();
-    this._offers = pointsModel.getOffers();
+    this._destinations = null;
+    this._offers = null;
 
     this._showedPointControllers = [];
+    this._tripListView = new TripListView();
     this._noPoinstView = new NoPointsView();
     this._sortView = new SortView();
-    this._tripListView = new TripListView();
+
     this._creatingPoint = null;
 
     this._onDataChange = this._onDataChange.bind(this);
@@ -57,15 +95,17 @@ export default class PointsBoard {
 
   render() {
     const container = this._container.getElement();
-    const points = this._pointsModel.getPoints();
 
+    const points = this._pointsModel.getPoints();
+    this._destinations = this._pointsModel.getDestinations();
+    this._offers = this._pointsModel.getOffers();
 
     if (points.length === 0) {
       render(container, this._noPoinstView);
       return;
     }
 
-    render(container, this._sortView);
+    render(container, this._sortView, `afterbegin`);
     render(container, this._tripListView);
 
     this._renderPoints(points);
@@ -76,25 +116,69 @@ export default class PointsBoard {
       return;
     }
 
-    const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
+    this._sortView.setSortType(SortType.EVENT);
+    this._updatePoints();
 
+    const tripList = this._tripListView.getElement();
     this._creatingPoint = new PointController(tripList, this._destinations, this._offers, this._onDataChange, this._onViewChange);
     this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
   }
 
   _removePoints() {
+    this._tripListView.clear();
     this._showedPointControllers.forEach((pointController) => pointController.destroy());
     this._showedPointControllers = [];
   }
 
   _renderPoints(points) {
-    const tripList = this._tripListView.getElement().querySelector(`.trip-events__list`);
-    this._showedPointControllers = renderPoints(tripList, points, this._destinations, this._offers, this._onDataChange, this._onViewChange);
+    const sortType = this._sortView.getSortType();
+    const container = this._tripListView.getElement();
+
+    switch (sortType) {
+      case SortType.EVENT:
+        const pointsDates = getTripDates(points);
+
+        pointsDates.forEach((date, index) => {
+          const pointsListView = new PointsListView(date, index + 1);
+          const pointContainer = pointsListView.getPointsContainer();
+          render(container, pointsListView);
+
+          const filterPoints = points.filter((point) => {
+            return new Date(point.date.checkIn).toDateString() === date;
+          });
+
+          const newControllers = this._renderPoint(pointContainer, filterPoints);
+          this._showedPointControllers.concat(newControllers);
+        });
+
+        break;
+
+      default:
+        const pointsListView = new PointsListView();
+        const pointContainer = pointsListView.getPointsContainer();
+        render(container, pointsListView);
+
+        this._showedPointControllers = this._renderPoint(pointContainer, points);
+
+        break;
+    }
+  }
+
+  _renderPoint(pointContainer, points) {
+    return points.map((point) => {
+      const pointController = new PointController(pointContainer, this._destinations, this._offers, this._onDataChange, this._onViewChange);
+      pointController.render(point, PointControllerMode.DEFAULT);
+
+      return pointController;
+    });
   }
 
   _updatePoints() {
+    const sortType = this._sortView.getSortType();
+    const sortedPoints = getSortedPoints(this._pointsModel.getPoints(), sortType);
+
     this._removePoints();
-    this._renderPoints(this._pointsModel.getPoints());
+    this._renderPoints(sortedPoints);
   }
 
   _onFilterChange() {
@@ -114,9 +198,10 @@ export default class PointsBoard {
         this._updatePoints();
       } else {
         this._pointsModel.addPoint(newData);
-        pointController.render(newData, PointControllerMode.DEFAULT);
 
+        pointController.render(newData, PointControllerMode.DEFAULT);
         this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
+        this._updatePoints();
       }
     } else if (newData === null) {
       this._pointsModel.removePoint(oldData.id);

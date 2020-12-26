@@ -1,4 +1,4 @@
-import Abstract from "./abstract.js";
+import AbstractSmart from "./abstract-smart.js";
 
 export const SortType = {
   EVENT: `sort-event`,
@@ -32,11 +32,13 @@ const createSortTemplate = () => {
 };
 
 
-export default class Sort extends Abstract {
+export default class Sort extends AbstractSmart {
   constructor() {
     super();
 
     this._currenSortType = SortType.EVENT;
+
+    this._setSortTypeChangeHandler = null;
   }
 
   getTemplate() {
@@ -47,7 +49,18 @@ export default class Sort extends Abstract {
     return this._currenSortType;
   }
 
+  setSortType(sortType) {
+    this._currenSortType = sortType;
+    this.rerender();
+  }
+
+  recoveryListeners() {
+    this.setSortTypeChangeHandler(this._setSortTypeChangeHandler);
+  }
+
   setSortTypeChangeHandler(handler) {
+    this._setSortTypeChangeHandler = handler;
+
     const inputs = this.getElement().querySelectorAll(`.trip-sort__input`);
 
     inputs.forEach((input) => {

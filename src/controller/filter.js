@@ -36,6 +36,12 @@ export default class FilterController {
     }
   }
 
+  setActiveFilterType(filterType) {
+    this._activeFilterType = filterType;
+    this._pointsModel.setFilter(this._activeFilterType);
+    this.render();
+  }
+
   _onFilterChange(filterType) { // просто сообщает контроллеру, какой пункт выбран
     this._activeFilterType = filterType;
     this._pointsModel.setFilter(this._activeFilterType);

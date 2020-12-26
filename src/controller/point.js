@@ -20,33 +20,34 @@ export const EmptyPoint = {
     checkIn: new Date(),
     checkOut: new Date(),
   },
+  offers: {},
   type: `taxi`,
   price: 0,
   isFavorite: false,
 };
 
-const parseFormData = (formData, destinations) => {
-  const city = document.querySelector(`#event-destination-1`).value;
-  const selectedOffers = Array.from(document.querySelectorAll(
-      `.event__offer-checkbox:checked + label[for^="event"]`));
+// const parseFormData = (formData, destinations) => {
+//   const city = document.querySelector(`#event-destination-1`).value;
+//   const selectedOffers = Array.from(document.querySelectorAll(
+//       `.event__offer-checkbox:checked + label[for^="event"]`));
 
-  return new PointModel({
-    'type': formData.get(`event-type`),
-    'date_from': formData.get(`event-start-time`),
-    'date_to': formData.get(`event-end-time`),
-    'destination': {
-      'name': destinations[city].name,
-      'description': destinations[city].description,
-      'pictures': destinations[city].pictures
-    },
-    'base_price': Number(formData.get(`event-price`)),
-    'is_favorite': Boolean(formData.get(`event-favorite`)),
-    'offers': selectedOffers.map((offer) => ({
-      'title': offer.querySelector(`.event__offer-title`).textContent,
-      'price': Number(offer.querySelector(`.event__offer-price`).textContent)
-    })),
-  });
-};
+//   return new PointModel({
+//     'type': formData.get(`event-type`),
+//     'date_from': formData.get(`event-start-time`),
+//     'date_to': formData.get(`event-end-time`),
+//     'destination': {
+//       'name': destinations[city].name,
+//       'description': destinations[city].description,
+//       'pictures': destinations[city].pictures
+//     },
+//     'base_price': Number(formData.get(`event-price`)),
+//     'is_favorite': Boolean(formData.get(`event-favorite`)),
+//     'offers': selectedOffers.map((offer) => ({
+//       'title': offer.querySelector(`.event__offer-title`).textContent,
+//       'price': Number(offer.querySelector(`.event__offer-price`).textContent)
+//     })),
+//   });
+// };
 
 export default class PointController {
   constructor(container, destinations, offers, onDataChange, onViewChange) {

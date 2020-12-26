@@ -26,4 +26,8 @@ export default class Header extends Abstract {
   getTemplate() {
     return createHeaderTemplate();
   }
+
+  setAddPointButtonClickHandler(handler) {
+    this.getElement().querySelector(`.trip-main__event-add-btn`).addEventListener(`click`, handler);
+  }
 }
