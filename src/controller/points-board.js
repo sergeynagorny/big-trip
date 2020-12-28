@@ -66,6 +66,14 @@ export default class PointsBoard {
     this._creatingPoint.render(EmptyPoint, PointControllerMode.ADDING);
   }
 
+  hide() {
+    this._container.hide();
+  }
+
+  show() {
+    this._container.show();
+  }
+
   _removePoints() {
     this._tripListView.clear();
     this._showedPointControllers.forEach((pointController) => pointController.destroy());
