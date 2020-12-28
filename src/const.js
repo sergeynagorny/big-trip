@@ -19,3 +19,8 @@ export const SortType = {
   TIME: `sort-time`,
   PRICE: `sort-price`,
 };
+
+export const TabsItem = {
+  TABLE: `Table`,
+  STATS: `Stats`,
+};
