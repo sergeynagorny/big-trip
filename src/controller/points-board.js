@@ -98,7 +98,7 @@ export default class PointsBoard {
           });
 
           const newControllers = this._renderPoint(pointContainer, filterPoints);
-          this._showedPointControllers.concat(newControllers);
+          this._showedPointControllers = [].concat(this._showedPointControllers, newControllers);
         });
 
         break;
