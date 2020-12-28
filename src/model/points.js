@@ -1,6 +1,8 @@
-import {FilterType} from "../const.js";
+import {FilterType, SortType} from "../const.js";
 import {createDestinationMap, createTypeOffersMap} from "../utils/common.js";
 import {getPointsByFilter} from "../utils/filter.js";
+import {getSortedPoints} from "../utils/sort.js";
+
 
 export default class Points {
   constructor() {
@@ -50,7 +52,7 @@ export default class Points {
   }
 
   getPointsAll() {
-    return this._points;
+    return getSortedPoints(this._points, SortType.EVENT);
   }
 
 

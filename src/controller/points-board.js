@@ -1,28 +1,12 @@
 import TripListView from "../view/trip-list.js";
 import PointsListView from "../view/points-list.js";
 import NoPointsView from "../view/no-points.js";
-import SortView, {SortType} from "../view/sort.js";
+import SortView from "../view/sort.js";
+import {SortType} from "../const.js";
+import {getSortedPoints} from "../utils/sort.js";
 import PointController, {Mode as PointControllerMode, EmptyPoint} from "./point.js";
 import {render} from "../utils/render.js";
 
-
-const getSortedPoints = (points, sortType) => {
-  let sortedPoints = [];
-
-  switch (sortType) {
-    case SortType.EVENT:
-      sortedPoints = points.slice().sort((a, b) => a.date.checkIn - b.date.checkIn);
-      break;
-    case SortType.TIME:
-      sortedPoints = points.slice().sort((a, b) => (b.date.checkOut - b.date.checkIn) - (a.date.checkOut - a.date.checkIn));
-      break;
-    case SortType.PRICE:
-      sortedPoints = points.slice().sort((a, b) => b.price - a.price);
-      break;
-  }
-
-  return sortedPoints;
-};
 
 const getTripDates = (points) => {
   return Array.from(new Set(points.map((point) => new Date(point.date.checkIn).toDateString())));
