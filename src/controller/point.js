@@ -12,14 +12,22 @@ export const Mode = {
   EDIT: `edit`,
 };
 
+const createEmptyPointDate = () => {
+  const checkIn = new Date();
+  const checkOut = new Date();
+  checkOut.setHours(checkIn.getHours() + 1);
+
+  return {
+    checkIn,
+    checkOut,
+  };
+};
+
 export const EmptyPoint = {
   destination: {
     name: ``,
   },
-  date: {
-    checkIn: new Date(),
-    checkOut: new Date(),
-  },
+  date: createEmptyPointDate(),
   offers: {},
   type: `taxi`,
   price: 0,

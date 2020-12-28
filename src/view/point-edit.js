@@ -1,11 +1,16 @@
 import AbstractSmart from "./abstract-smart.js";
 import {capitalizeFirstLetter, formatTypesGroup} from '../utils/common.js';
-import dayjs from 'dayjs';
+import {getDateTime} from '../utils/datetime.js';
+import flatpickr from "flatpickr";
+import "flatpickr/dist/flatpickr.min.css";
 
 
 const parseFormData = (formData, destinationMap, offersMap) => {
   const destinationInput = formData.get(`event-destination`);
   const type = formData.get(`event-type`);
+
+  const eventStartInput = document.querySelector(`input[name="event-start-time"]`);
+  const eventEndInput = document.querySelector(`input[name="event-end-time"]`);
 
   const selectedOffers = Array.from(document.querySelectorAll(`.event__offer-checkbox:checked`));
   const offers = selectedOffers.reduce((acc, item) => {
@@ -19,8 +24,8 @@ const parseFormData = (formData, destinationMap, offersMap) => {
     type,
     offers,
     date: {
-      checkIn: new Date(),
-      checkOut: new Date(),
+      checkIn: new Date(eventStartInput.value),
+      checkOut: new Date(eventEndInput.value),
     },
   };
 };
@@ -120,17 +125,13 @@ const createInfoMarkup = (description, pictures) => {
   `) : ``;
 };
 
-const formatInputTime = (time) => {
-  return dayjs(time).format(`DD/MM/YY HH:mm`);
-};
-
 const createDestinationList = (destinations) => {
   return Object.values(destinations).map((item) => `<option value="${item.name}"></option>`).join(`\n`);
 };
 
 const createPointEditTemplate = (point, options = {}, destinationsData, offersData) => {
-  const {date: {checkIn, checkOut}, price, id} = point;
-  const {type, offers, destination: {name, description, pictures}} = options;
+  const {price, id} = point;
+  const {type, date: {checkIn, checkOut}, offers, destination: {name, description, pictures}} = options;
 
   const resetButtonName = id ? `Delete` : `Cancel`;
   const typeOffers = offersData[type].offers;
@@ -138,6 +139,8 @@ const createPointEditTemplate = (point, options = {}, destinationsData, offersDa
   const typeListMarkup = createPointTypeListMarkup(type, offersData);
   const offersMarkup = createOffersMarkup(typeOffers, offers);
   const infoMarkup = createInfoMarkup(description, pictures);
+
+  const isButtonSaveBlock = !!name && (checkIn < checkOut);
 
   return (`
     <form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -162,10 +165,10 @@ const createPointEditTemplate = (point, options = {}, destinationsData, offersDa
 
         <div class="event__field-group  event__field-group--time">
           <label class="visually-hidden" for="event-start-time-1">From</label>
-          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatInputTime(checkIn)}">
+          <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${checkIn}">
           &mdash;
           <label class="visually-hidden" for="event-end-time-1">To</label>
-          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatInputTime(checkOut)}">
+          <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${checkOut}">
         </div>
 
         <div class="event__field-group  event__field-group--price">
@@ -173,10 +176,10 @@ const createPointEditTemplate = (point, options = {}, destinationsData, offersDa
             <span class="visually-hidden">Price</span>
             &euro;
           </label>
-          <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+          <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" min="0" value="${price}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit"${isButtonSaveBlock ? `` : `disabled`}>Save</button>
         <button class="event__reset-btn" type="reset">${resetButtonName}</button>
       </header>
       ${(offersMarkup || infoMarkup) ? `<section class="event__details">${offersMarkup} ${infoMarkup}</section>` : ``}
@@ -195,11 +198,17 @@ export default class PointEdit extends AbstractSmart {
 
     this._submitHandler = null;
     this._deleteButtonClickHandler = null;
+    this._flatpickrCheckIn = null;
+    this._flatpickrCheckOut = null;
 
     this._destination = point.destination;
+    this._dateCheckIn = point.date.checkIn;
+    this._dateCheckOut = point.date.checkOut;
     this._type = point.type;
     this._activeOffers = point.offers;
+    this._price = point.price;
 
+    this._applyFlatpickr();
     this._subscribeOnEvents();
   }
 
@@ -207,9 +216,14 @@ export default class PointEdit extends AbstractSmart {
     return createPointEditTemplate(
         this._point,
         {
+          price: this._price,
           destination: this._destination,
           type: this._type,
           offers: this._activeOffers,
+          date: {
+            checkIn: this._dateCheckIn,
+            checkOut: this._dateCheckOut,
+          }
         },
         this._destinations,
         this._offers
@@ -217,10 +231,12 @@ export default class PointEdit extends AbstractSmart {
   }
 
   removeElement() {
-    // if (this._flatpickr) {
-    //   this._flatpickr.destroy();
-    //   this._flatpickr = null;
-    // }
+    if (this._flatpickrCheckIn || this._flatpickrCheckOut) {
+      this._flatpickrCheckIn.destroy();
+      this._flatpickrCheckIn = null;
+      this._flatpickrCheckOut.destroy();
+      this._flatpickrCheckOut = null;
+    }
 
     super.removeElement();
   }
@@ -233,6 +249,7 @@ export default class PointEdit extends AbstractSmart {
 
   rerender() {
     super.rerender();
+    this._applyFlatpickr();
   }
 
   reset() {
@@ -240,7 +257,10 @@ export default class PointEdit extends AbstractSmart {
 
     this._destination = point.destination;
     this._type = point.type;
+    this._price = point.price;
     this._activeOffers = point.offers;
+    this._dateCheckIn = point.date.checkIn;
+    this._dateCheckOut = point.date.checkOut;
 
     this.rerender();
   }
@@ -263,23 +283,57 @@ export default class PointEdit extends AbstractSmart {
     this._deleteButtonClickHandler = handler;
   }
 
+  _applyFlatpickr() {
+    if (this._flatpickrCheckIn || this._flatpickrCheckOut) {
+      this._flatpickrCheckIn.destroy();
+      this._flatpickrCheckIn = null;
+      this._flatpickrCheckOut.destroy();
+      this._flatpickrCheckOut = null;
+    }
+
+    const pointEdit = this.getElement();
+    const eventStartInput = pointEdit.querySelector(`input[name="event-start-time"]`);
+    const eventEndInput = pointEdit.querySelector(`input[name="event-end-time"]`);
+
+    this._flatpickrCheckIn = flatpickr(eventStartInput, {
+      altInput: true,
+      dateFormat: `Y-m-d H:i`,
+      altFormat: `d/m/y H:i`,
+      allowInput: true,
+      time_24hr: true,
+      enableTime: true,
+      defaultDate: this._dateCheckIn,
+    });
+
+    this._flatpickrCheckOut = flatpickr(eventEndInput, {
+      altInput: true,
+      dateFormat: `Y-m-d H:i`,
+      altFormat: `d/m/y H:i`,
+      allowInput: true,
+      time_24hr: true,
+      enableTime: true,
+      defaultDate: this._dateCheckOut,
+      minDate: this._dateCheckIn || `today`,
+    });
+  }
+
   _subscribeOnEvents() {
     const pointEdit = this.getElement();
     const eventsList = pointEdit.querySelector(`.event__type-list`);
     const destinationInput = pointEdit.querySelector(`.event__input--destination`);
 
-    // const eventStartInput = pointEdit.querySelector(`input[name="event-start-time"]`);
-    // const eventEndInput = pointEdit.querySelector(`input[name="event-end-time"]`);
+    const eventStartInput = pointEdit.querySelector(`input[name="event-start-time"]`);
+    const eventEndInput = pointEdit.querySelector(`input[name="event-end-time"]`);
 
-    // eventStartInput.addEventListener(`click`, () => {
-    //   this._checkIn = eventStartInput.value;
-    //   this.rerender();
-    // });
+    eventStartInput.addEventListener(`change`, () => {
+      this._dateCheckIn = new Date(eventStartInput.value);
+      this.rerender();
+    });
 
-    // eventEndInput.addEventListener(`click`, () => {
-    //   this._checkOut = eventEndInput.value;
-    //   this.rerender();
-    // });
+    eventEndInput.addEventListener(`change`, () => {
+      this._dateCheckOut = new Date(eventEndInput.value);
+      this.rerender();
+    });
 
     eventsList.addEventListener(`input`, (evt) => {
       this._type = evt.target.value;

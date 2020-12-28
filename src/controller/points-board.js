@@ -24,48 +24,6 @@ const getSortedPoints = (points, sortType) => {
   return sortedPoints;
 };
 
-const renderPoints = (container, points, destinations, offers, onDataChange, onViewChange, defaultSortType = true) => {
-  let allControllers = [];
-
-  if (defaultSortType) {
-    const dates = getTripDates(points);
-
-    dates.forEach((date, index) => {
-      const pointsListView = new PointsListView(date, index + 1);
-      const pointContainer = pointsListView.getPointsContainer();
-      render(container, pointsListView);
-
-      const newControllers = points
-        .filter((point) => {
-          return new Date(point.date.checkIn).toDateString() === date;
-        })
-        .map((point) => {
-          const pointController = new PointController(pointContainer, destinations, offers, onDataChange, onViewChange);
-          pointController.render(point, PointControllerMode.DEFAULT);
-
-          return pointController;
-        });
-
-      allControllers = [].concat(allControllers, newControllers);
-    });
-
-    return allControllers;
-  } else {
-    const pointsListView = new PointsListView();
-    const pointContainer = pointsListView.getPointsContainer();
-    render(container, pointsListView);
-
-    allControllers = points.map((point) => {
-      const pointController = new PointController(pointContainer, destinations, offers, onDataChange, onViewChange);
-      pointController.render(point, PointControllerMode.DEFAULT);
-
-      return pointController;
-    });
-
-    return allControllers;
-  }
-};
-
 const getTripDates = (points) => {
   return Array.from(new Set(points.map((point) => new Date(point.date.checkIn).toDateString())));
 };
@@ -212,6 +170,7 @@ export default class PointsBoard {
       if (isSuccess) {
         pointController.render(newData, PointControllerMode.DEFAULT);
       }
+      this._updatePoints();
     }
   }
 
