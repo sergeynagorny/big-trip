@@ -1,14 +1,32 @@
+import Point from "./model/point.js";
+
 export default class API {
-  constructor(url, authorization) {
+  constructor(authorization) {
     this._authorization = authorization;
-    this._url = url;
   }
 
-  getTasks() {
+  getPoints() {
     const headers = new Headers();
     headers.append(`Authorization`, this._authorization);
 
-    return fetch(this._url, {headers})
+    return fetch(`https://11.ecmascript.pages.academy/big-trip/points`, {headers})
+      .then((response) => response.json())
+      .then(Point.parsePoints);
+  }
+
+  getOffers() {
+    const headers = new Headers();
+    headers.append(`Authorization`, this._authorization);
+
+    return fetch(`https://11.ecmascript.pages.academy/big-trip/offers`, {headers})
+      .then((response) => response.json());
+  }
+
+  getDestinations() {
+    const headers = new Headers();
+    headers.append(`Authorization`, this._authorization);
+
+    return fetch(`https://11.ecmascript.pages.academy/big-trip/destinations`, {headers})
       .then((response) => response.json());
   }
 }
