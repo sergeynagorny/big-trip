@@ -12,28 +12,6 @@ export const Mode = {
   EDIT: `edit`,
 };
 
-const createEmptyPointDate = () => {
-  const checkIn = new Date();
-  const checkOut = new Date();
-  checkOut.setHours(checkIn.getHours() + 1);
-
-  return {
-    checkIn,
-    checkOut,
-  };
-};
-
-export const EmptyPoint = {
-  destination: {
-    name: ``,
-  },
-  date: createEmptyPointDate(),
-  offers: {},
-  type: `taxi`,
-  price: 0,
-  isFavorite: false,
-};
-
 // const parseFormData = (formData, destinations) => {
 //   const city = document.querySelector(`#event-destination-1`).value;
 //   const selectedOffers = Array.from(document.querySelectorAll(
@@ -56,6 +34,53 @@ export const EmptyPoint = {
 //     })),
 //   });
 // };
+
+
+const parseFormData = (formData, destinationMap, offersMap) => {
+  const destinationInput = formData.get(`event-destination`);
+  const type = formData.get(`event-type`);
+
+  const eventStartInput = document.querySelector(`input[name="event-start-time"]`);
+  const eventEndInput = document.querySelector(`input[name="event-end-time"]`);
+
+  const selectedOffers = Array.from(document.querySelectorAll(`.event__offer-checkbox:checked`));
+  const offers = selectedOffers.reduce((acc, item) => {
+    acc[item.value] = offersMap[type].offers[item.value];
+    return acc;
+  }, {});
+
+  return new PointModel({
+    'destination': destinationMap[destinationInput.toLowerCase()],
+    'base_price': Number(formData.get(`event-price`)),
+    'type': type,
+    'offers': Object.values(offers),
+    'is_favorite': false,
+    'date_from': eventStartInput.value,
+    'date_to': eventEndInput.value,
+  });
+};
+
+const createEmptyPointDate = () => {
+  const checkIn = new Date();
+  const checkOut = new Date();
+  checkOut.setHours(checkIn.getHours() + 1);
+
+  return {
+    checkIn,
+    checkOut,
+  };
+};
+
+export const EmptyPoint = {
+  destination: {
+    name: ``,
+  },
+  date: createEmptyPointDate(),
+  offers: {},
+  type: `taxi`,
+  price: 0,
+  isFavorite: false,
+};
 
 export default class PointController {
   constructor(container, destinations, offers, onDataChange, onViewChange) {
@@ -126,7 +151,10 @@ export default class PointController {
 
     this._pointEditView.setSubmitHandler((evt) => {
       evt.preventDefault();
-      const data = this._pointEditView.getData();
+
+      const formData = this._pointEditView.getData();
+      const data = parseFormData(formData, this._destinations, this._offers);
+
       this._onDataChange(this, this._point, data);
     });
 
@@ -135,9 +163,10 @@ export default class PointController {
     });
 
     this._pointView.setFavoritesButtonClickHandler(() => {
-      this._onDataChange(this, this._point, Object.assign({}, this._point, {
-        isFavorite: !this._point.isFavorite
-      }));
+      const newPoint = PointModel.clone(this._point);
+      newPoint.isFavorite = !newPoint.isFavorite;
+
+      this._onDataChange(this, this._point, newPoint);
     });
   }
 

@@ -5,31 +5,6 @@ import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 
 
-const parseFormData = (formData, destinationMap, offersMap) => {
-  const destinationInput = formData.get(`event-destination`);
-  const type = formData.get(`event-type`);
-
-  const eventStartInput = document.querySelector(`input[name="event-start-time"]`);
-  const eventEndInput = document.querySelector(`input[name="event-end-time"]`);
-
-  const selectedOffers = Array.from(document.querySelectorAll(`.event__offer-checkbox:checked`));
-  const offers = selectedOffers.reduce((acc, item) => {
-    acc[item.value] = offersMap[type].offers[item.value];
-    return acc;
-  }, {});
-
-  return {
-    destination: destinationMap[destinationInput.toLowerCase()] || {name: destinationInput},
-    price: Number(formData.get(`event-price`)),
-    type,
-    offers,
-    date: {
-      checkIn: new Date(eventStartInput.value),
-      checkOut: new Date(eventEndInput.value),
-    },
-  };
-};
-
 const createPointTypeListMarkup = (activeType, data) => {
 
   const typesGroup = Object.keys(data).reduce((acc, key) => {
@@ -267,9 +242,7 @@ export default class PointEdit extends AbstractSmart {
 
   getData() {
     const form = this.getElement();
-    const formData = new FormData(form);
-
-    return parseFormData(formData, this._destinations, this._offers);
+    return new FormData(form);
   }
 
   setSubmitHandler(handler) {

@@ -1,5 +1,6 @@
 import {createOffersMap} from "../utils/common.js";
 
+
 export default class Point {
   constructor(data) {
     this.id = data[`id`];
@@ -22,16 +23,16 @@ export default class Point {
     return {
       'id': this.id,
       'type': this.type,
-      'date_from': this.start.toISOString(),
-      'date_to': this.end.toISOString(),
+      'date_from': this.date.checkIn.toISOString(),
+      'date_to': this.date.checkOut.toISOString(),
       'destination': {
-        'name': this.city,
-        'description': this.description,
-        'pictures': this.photos
+        'name': this.destination.name,
+        'description': this.destination.description,
+        'pictures': this.destination.pictures,
       },
       'base_price': this.price,
       'is_favorite': this.isFavorite,
-      'offers': this.selectedOffers
+      'offers': Object.values(this.offers),
     };
   }
 
@@ -43,7 +44,7 @@ export default class Point {
     return data.map(Point.parsePoint);
   }
 
-  // static clone(data) {
-  //   return new Point(data.toRAW());
-  // }
+  static clone(data) {
+    return new Point(data.toRAW());
+  }
 }
