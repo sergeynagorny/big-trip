@@ -129,9 +129,6 @@ const createPointEditTemplate = (options = {}, destinationsData, offersData) => 
   const offersMarkup = createOffersMarkup(typeOffers, offers);
   const infoMarkup = createInfoMarkup(description, pictures);
 
-
-  console.log();
-
   const isButtonSaveBlock = !!name && (checkIn < checkOut);
 
   const deleteButtonText = externalData.deleteButtonText;
