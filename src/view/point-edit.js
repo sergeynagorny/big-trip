@@ -1,9 +1,17 @@
 import AbstractSmart from "./abstract-smart.js";
 import {capitalizeFirstLetter, formatTypesGroup} from '../utils/common.js';
-import {getDateTime} from '../utils/datetime.js';
 import flatpickr from "flatpickr";
 import "flatpickr/dist/flatpickr.min.css";
 
+const DefaultData = {
+  saveButtonText: `Save`,
+  deleteButtonText: `Delete`,
+};
+
+const NewData = {
+  saveButtonText: `Save`,
+  deleteButtonText: `Cancel`,
+};
 
 const createPointTypeListMarkup = (activeType, data) => {
 
@@ -104,11 +112,9 @@ const createDestinationList = (destinations) => {
   return Object.values(destinations).map((item) => `<option value="${item.name}"></option>`).join(`\n`);
 };
 
-const createPointEditTemplate = (point, options = {}, destinationsData, offersData) => {
-  const {price, id} = point;
-  const {type, date: {checkIn, checkOut}, offers, destination: {name, description, pictures}} = options;
+const createPointEditTemplate = (options = {}, destinationsData, offersData) => {
+  const {type, date: {checkIn, checkOut}, offers, destination: {name, description, pictures}, price, externalData} = options;
 
-  const resetButtonName = id ? `Delete` : `Cancel`;
   const typeOffers = offersData[type].offers;
   const destinationListMarkup = createDestinationList(destinationsData);
   const typeListMarkup = createPointTypeListMarkup(type, offersData);
@@ -116,6 +122,9 @@ const createPointEditTemplate = (point, options = {}, destinationsData, offersDa
   const infoMarkup = createInfoMarkup(description, pictures);
 
   const isButtonSaveBlock = !!name && (checkIn < checkOut);
+
+  const deleteButtonText = externalData.deleteButtonText;
+  const saveButtonText = externalData.saveButtonText;
 
   return (`
     <form class="trip-events__item  event  event--edit" action="#" method="post">
@@ -154,8 +163,8 @@ const createPointEditTemplate = (point, options = {}, destinationsData, offersDa
           <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" min="0" value="${price}">
         </div>
 
-        <button class="event__save-btn  btn  btn--blue" type="submit"${isButtonSaveBlock ? `` : `disabled`}>Save</button>
-        <button class="event__reset-btn" type="reset">${resetButtonName}</button>
+        <button class="event__save-btn  btn  btn--blue" type="submit"${isButtonSaveBlock ? `` : `disabled`}>${saveButtonText}</button>
+        <button class="event__reset-btn" type="reset">${deleteButtonText}</button>
       </header>
       ${(offersMarkup || infoMarkup) ? `<section class="event__details">${offersMarkup} ${infoMarkup}</section>` : ``}
     </form>
@@ -175,6 +184,7 @@ export default class PointEdit extends AbstractSmart {
     this._deleteButtonClickHandler = null;
     this._flatpickrCheckIn = null;
     this._flatpickrCheckOut = null;
+    this._externalData = point.id ? DefaultData : NewData;
 
     this._destination = point.destination;
     this._dateCheckIn = point.date.checkIn;
@@ -189,8 +199,8 @@ export default class PointEdit extends AbstractSmart {
 
   getTemplate() {
     return createPointEditTemplate(
-        this._point,
         {
+          externalData: this._externalData,
           price: this._price,
           destination: this._destination,
           type: this._type,
@@ -245,6 +255,11 @@ export default class PointEdit extends AbstractSmart {
     return new FormData(form);
   }
 
+  setData(data) {
+    this._externalData = Object.assign({}, DefaultData, data);
+    this.rerender();
+  }
+
   setSubmitHandler(handler) {
     this.getElement().addEventListener(`submit`, handler);
     this._submitHandler = handler;
@@ -287,6 +302,17 @@ export default class PointEdit extends AbstractSmart {
       enableTime: true,
       defaultDate: this._dateCheckOut,
       minDate: this._dateCheckIn || `today`,
+    });
+  }
+
+  disabledForm() {
+    const pointEdit = this.getElement();
+    const inputs = Array.from(pointEdit.querySelectorAll(`input`));
+    const buttons = Array.from(pointEdit.querySelectorAll(`button`));
+    const formElements = [].concat(inputs, buttons);
+
+    formElements.forEach((element) => {
+      element.disabled = true;
     });
   }
 

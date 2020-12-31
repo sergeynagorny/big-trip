@@ -127,6 +127,11 @@ export default class PointController {
     setTimeout(() => {
       this._pointEditView.getElement().style.animation = ``;
       this._pointView.getElement().style.animation = ``;
+
+      this._pointEditView.setData({
+        saveButtonText: `Save`,
+        deleteButtonText: `Delete`,
+      });
     }, SHAKE_ANIMATION_TIMEOUT);
   }
 
@@ -142,10 +147,22 @@ export default class PointController {
       const formData = this._pointEditView.getData();
       const data = parseFormData(formData, this._destinations, this._offers);
 
+      this._pointEditView.setData({
+        saveButtonText: `Saving...`,
+      });
+
+      this._pointEditView.disabledForm();
+
       this._onDataChange(this, this._point, data);
     });
 
     this._pointEditView.setDeleteButtonClickHandler(() => {
+      this._pointEditView.setData({
+        deleteButtonText: `Deleting...`,
+      });
+
+      this._pointEditView.disabledForm();
+
       this._onDataChange(this, this._point, null);
     });
 
