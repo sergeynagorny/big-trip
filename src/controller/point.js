@@ -5,36 +5,13 @@ import PointEditView from "../view/point-edit.js";
 
 import {render, remove, replace} from "../utils/render.js";
 
+const SHAKE_ANIMATION_TIMEOUT = 600;
 
 export const Mode = {
   ADDING: `adding`,
   DEFAULT: `default`,
   EDIT: `edit`,
 };
-
-// const parseFormData = (formData, destinations) => {
-//   const city = document.querySelector(`#event-destination-1`).value;
-//   const selectedOffers = Array.from(document.querySelectorAll(
-//       `.event__offer-checkbox:checked + label[for^="event"]`));
-
-//   return new PointModel({
-//     'type': formData.get(`event-type`),
-//     'date_from': formData.get(`event-start-time`),
-//     'date_to': formData.get(`event-end-time`),
-//     'destination': {
-//       'name': destinations[city].name,
-//       'description': destinations[city].description,
-//       'pictures': destinations[city].pictures
-//     },
-//     'base_price': Number(formData.get(`event-price`)),
-//     'is_favorite': Boolean(formData.get(`event-favorite`)),
-//     'offers': selectedOffers.map((offer) => ({
-//       'title': offer.querySelector(`.event__offer-title`).textContent,
-//       'price': Number(offer.querySelector(`.event__offer-price`).textContent)
-//     })),
-//   });
-// };
-
 
 const parseFormData = (formData, destinationMap, offersMap) => {
   const destinationInput = formData.get(`event-destination`);
@@ -141,6 +118,16 @@ export default class PointController {
     remove(this._pointView);
     remove(this._pointEditView);
     document.removeEventListener(`keydown`, this._onEscKeyDown);
+  }
+
+  shake() {
+    this._pointEditView.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+    this._pointView.getElement().style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      this._pointEditView.getElement().style.animation = ``;
+      this._pointView.getElement().style.animation = ``;
+    }, SHAKE_ANIMATION_TIMEOUT);
   }
 
   _setupEventHandlers() {

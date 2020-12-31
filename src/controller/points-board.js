@@ -155,14 +155,19 @@ export default class PointsBoard {
 
             this._showedPointControllers = [].concat(pointController, this._showedPointControllers);
             this._updatePoints();
+          })
+          .catch(() => {
+            pointController.shake();
           });
-
       }
     } else if (newData === null) {
       this._api.deletePoint(oldData.id)
         .then(() => {
           this._pointsModel.removePoint(oldData.id);
           this._updatePoints();
+        })
+        .catch(() => {
+          pointController.shake();
         });
     } else {
       this._api.updatePoint(oldData.id, newData)
@@ -173,6 +178,9 @@ export default class PointsBoard {
             pointController.render(pointModel, PointControllerMode.DEFAULT);
             this._updatePoints();
           }
+        })
+        .catch(() => {
+          pointController.shake();
         });
     }
   }
