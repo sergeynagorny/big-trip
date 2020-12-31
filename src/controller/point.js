@@ -49,6 +49,7 @@ const createEmptyPointDate = () => {
 };
 
 export const EmptyPoint = {
+  isNewPoint: true,
   destination: {
     name: ``,
   },

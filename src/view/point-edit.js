@@ -9,11 +9,6 @@ const DefaultData = {
   deleteButtonText: `Delete`,
 };
 
-const NewData = {
-  saveButtonText: `Save`,
-  deleteButtonText: `Cancel`,
-};
-
 const createPointTypeListMarkup = (activeType, data) => {
 
   const typesGroup = Object.keys(data).reduce((acc, key) => {
@@ -119,7 +114,9 @@ const createDestinationList = (destinations) => {
 };
 
 const createPointEditTemplate = (options = {}, destinationsData, offersData) => {
-  const {isFavorite, type, date: {checkIn, checkOut}, offers, destination: {name: currentName, description, pictures}, price, externalData} = options;
+  const {isNewPoint, isFavorite, type, date: {checkIn, checkOut}, offers, destination: {name: currentName, description, pictures}, price, externalData} = options;
+
+  const hiddenStyle = isNewPoint ? `style="display: none;"` : ``;
 
   const name = encode(currentName);
 
@@ -172,18 +169,17 @@ const createPointEditTemplate = (options = {}, destinationsData, offersData) => 
         </div>
 
         <button class="event__save-btn  btn  btn--blue" type="submit"${isButtonSaveBlock ? `` : `disabled`}>${saveButtonText}</button>
-        <button class="event__reset-btn" type="reset">${deleteButtonText}</button>
-
+        <button class="event__reset-btn" type="reset">${isNewPoint ? `Cancel` : deleteButtonText}</button>
 
         <input id="event-favorite-1" class="event__favorite-checkbox visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
-          <label class="event__favorite-btn" for="event-favorite-1">
-            <span class="visually-hidden">Add to favorite</span>
-            <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
-              <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
-            </svg>
+        <label ${hiddenStyle} class="event__favorite-btn" for="event-favorite-1">
+          <span class="visually-hidden">Add to favorite</span>
+          <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+            <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+          </svg>
         </label>
 
-        <button class="event__rollup-btn" type="button">
+        <button ${hiddenStyle} class="event__rollup-btn" type="button">
           <span class="visually-hidden">Close event</span>
         </button>
 
@@ -207,10 +203,10 @@ export default class PointEdit extends AbstractSmart {
     this._favoriteButtonClickHandler = null;
     this._closeButtonClickHandler = null;
 
-
     this._flatpickrCheckIn = null;
     this._flatpickrCheckOut = null;
-    this._externalData = point.id ? DefaultData : NewData;
+    this._isNewPoint = point.isNewPoint || false;
+    this._externalData = DefaultData;
 
     this._destination = point.destination;
     this._dateCheckIn = point.date.checkIn;
@@ -227,6 +223,7 @@ export default class PointEdit extends AbstractSmart {
   getTemplate() {
     return createPointEditTemplate(
         {
+          isNewPoint: this._isNewPoint,
           externalData: this._externalData,
           price: this._price,
           destination: this._destination,
