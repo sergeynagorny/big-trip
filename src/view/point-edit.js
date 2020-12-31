@@ -45,6 +45,11 @@ const createPointTypeListMarkup = (activeType, data) => {
 };
 
 const createOffersMarkup = (allOffers, activeOffers) => {
+
+  if (Object.keys(allOffers).length === 0) {
+    return ``;
+  }
+
   const offersList = Object.keys(allOffers).map((key, index) => {
     const offer = allOffers[key];
     const isChecked = activeOffers.hasOwnProperty(key) ? `checked` : ``;
@@ -123,6 +128,9 @@ const createPointEditTemplate = (options = {}, destinationsData, offersData) => 
   const typeListMarkup = createPointTypeListMarkup(type, offersData);
   const offersMarkup = createOffersMarkup(typeOffers, offers);
   const infoMarkup = createInfoMarkup(description, pictures);
+
+
+  console.log();
 
   const isButtonSaveBlock = !!name && (checkIn < checkOut);
 
