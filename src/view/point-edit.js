@@ -119,7 +119,7 @@ const createDestinationList = (destinations) => {
 };
 
 const createPointEditTemplate = (options = {}, destinationsData, offersData) => {
-  const {type, date: {checkIn, checkOut}, offers, destination: {name, description: currentDescription, pictures}, price, externalData} = options;
+  const {isFavorite, type, date: {checkIn, checkOut}, offers, destination: {name, description: currentDescription, pictures}, price, externalData} = options;
 
   const description = encode(currentDescription);
 
@@ -173,6 +173,20 @@ const createPointEditTemplate = (options = {}, destinationsData, offersData) => 
 
         <button class="event__save-btn  btn  btn--blue" type="submit"${isButtonSaveBlock ? `` : `disabled`}>${saveButtonText}</button>
         <button class="event__reset-btn" type="reset">${deleteButtonText}</button>
+
+
+        <input id="event-favorite-1" class="event__favorite-checkbox visually-hidden" type="checkbox" name="event-favorite" ${isFavorite ? `checked` : ``}>
+          <label class="event__favorite-btn" for="event-favorite-1">
+            <span class="visually-hidden">Add to favorite</span>
+            <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
+              <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
+            </svg>
+        </label>
+
+        <button class="event__rollup-btn" type="button">
+          <span class="visually-hidden">Close event</span>
+        </button>
+
       </header>
       ${(offersMarkup || infoMarkup) ? `<section class="event__details">${offersMarkup} ${infoMarkup}</section>` : ``}
     </form>
@@ -190,6 +204,10 @@ export default class PointEdit extends AbstractSmart {
 
     this._submitHandler = null;
     this._deleteButtonClickHandler = null;
+    this._favoriteButtonClickHandler = null;
+    this._closeButtonClickHandler = null;
+
+
     this._flatpickrCheckIn = null;
     this._flatpickrCheckOut = null;
     this._externalData = point.id ? DefaultData : NewData;
@@ -200,6 +218,7 @@ export default class PointEdit extends AbstractSmart {
     this._type = point.type;
     this._activeOffers = point.offers;
     this._price = point.price;
+    this._isFavorite = point.isFavorite;
 
     this._applyFlatpickr();
     this._subscribeOnEvents();
@@ -216,7 +235,8 @@ export default class PointEdit extends AbstractSmart {
           date: {
             checkIn: this._dateCheckIn,
             checkOut: this._dateCheckOut,
-          }
+          },
+          isFavorite: this._isFavorite,
         },
         this._destinations,
         this._offers
@@ -237,6 +257,8 @@ export default class PointEdit extends AbstractSmart {
   recoveryListeners() {
     this.setSubmitHandler(this._submitHandler);
     this.setDeleteButtonClickHandler(this._deleteButtonClickHandler);
+    this.setCloseButtonClickHandler(this._closeButtonClickHandler);
+    this.setFavoriteButtonClickHandler(this._favoriteButtonClickHandler);
     this._subscribeOnEvents();
   }
 
@@ -277,6 +299,17 @@ export default class PointEdit extends AbstractSmart {
     this.getElement().querySelector(`.event__reset-btn`).addEventListener(`click`, handler);
 
     this._deleteButtonClickHandler = handler;
+  }
+
+  setCloseButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__rollup-btn`).addEventListener(`click`, handler);
+    this._closeButtonClickHandler = handler;
+  }
+
+  setFavoriteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.event__favorite-checkbox`).addEventListener(`click`, handler);
+
+    this._favoriteButtonClickHandler = handler;
   }
 
   _applyFlatpickr() {

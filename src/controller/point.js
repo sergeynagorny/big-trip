@@ -31,7 +31,7 @@ const parseFormData = (formData, destinationMap, offersMap) => {
     'base_price': Number(formData.get(`event-price`)),
     'type': type,
     'offers': Object.values(offers),
-    'is_favorite': false,
+    'is_favorite': Boolean(formData.get(`event-favorite`)),
     'date_from': eventStartInput.value,
     'date_to': eventEndInput.value,
   });
@@ -166,6 +166,15 @@ export default class PointController {
       this._onDataChange(this, this._point, null);
     });
 
+    this._pointEditView.setCloseButtonClickHandler(() => {
+      this._replaceEditToPoint();
+      document.removeEventListener(`keydown`, this._onEscKeyDown);
+    });
+
+    this._pointEditView.setFavoriteButtonClickHandler(() => {
+
+    });
+
     this._pointView.setFavoritesButtonClickHandler(() => {
       const newPoint = PointModel.clone(this._point);
       newPoint.isFavorite = !newPoint.isFavorite;
@@ -184,7 +193,7 @@ export default class PointController {
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     this._pointEditView.reset();
 
-    if (document.contains(this._pointEditView.getElement())) { // можно попробовать убрать этот IF
+    if (document.contains(this._pointEditView.getElement())) {
       replace(this._pointView, this._pointEditView);
     }
 

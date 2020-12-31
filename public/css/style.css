@@ -985,7 +985,7 @@ main {
   width: 45px;
   height: 45px;
   margin: 0;
-  margin-left: auto;
+  margin-left: 0;
   padding: 0;
 
   background-color: transparent;
