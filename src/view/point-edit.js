@@ -119,9 +119,9 @@ const createDestinationList = (destinations) => {
 };
 
 const createPointEditTemplate = (options = {}, destinationsData, offersData) => {
-  const {isFavorite, type, date: {checkIn, checkOut}, offers, destination: {name, description: currentDescription, pictures}, price, externalData} = options;
+  const {isFavorite, type, date: {checkIn, checkOut}, offers, destination: {name: currentName, description, pictures}, price, externalData} = options;
 
-  const description = encode(currentDescription);
+  const name = encode(currentName);
 
   const typeOffers = offersData[type].offers;
   const destinationListMarkup = createDestinationList(destinationsData);
