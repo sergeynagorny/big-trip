@@ -1,6 +1,7 @@
 import AbstractSmart from "./abstract-smart.js";
 import {capitalizeFirstLetter, formatTypesGroup} from '../utils/common.js';
 import flatpickr from "flatpickr";
+import {encode} from "he";
 import "flatpickr/dist/flatpickr.min.css";
 
 const DefaultData = {
@@ -113,7 +114,9 @@ const createDestinationList = (destinations) => {
 };
 
 const createPointEditTemplate = (options = {}, destinationsData, offersData) => {
-  const {type, date: {checkIn, checkOut}, offers, destination: {name, description, pictures}, price, externalData} = options;
+  const {type, date: {checkIn, checkOut}, offers, destination: {name, description: currentDescription, pictures}, price, externalData} = options;
+
+  const description = encode(currentDescription);
 
   const typeOffers = offersData[type].offers;
   const destinationListMarkup = createDestinationList(destinationsData);
