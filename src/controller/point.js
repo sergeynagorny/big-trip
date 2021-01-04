@@ -27,7 +27,7 @@ const parseFormData = (formData, destinationMap, offersMap) => {
   }, {});
 
   return new PointModel({
-    'destination': destinationMap[destinationInput.toLowerCase()],
+    'destination': destinationMap[destinationInput.toLowerCase()] || {'name': destinationInput, 'description': ` `, 'pictures': []},
     'base_price': Number(formData.get(`event-price`)),
     'type': type,
     'offers': Object.values(offers),
@@ -52,6 +52,8 @@ export const EmptyPoint = {
   isNewPoint: true,
   destination: {
     name: ``,
+    description: ``,
+    pictures: [],
   },
   date: createEmptyPointDate(),
   offers: {},

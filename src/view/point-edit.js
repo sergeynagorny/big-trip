@@ -97,10 +97,11 @@ const createInfoMarkup = (description, pictures) => {
     `);
   };
 
-  const photosMarkup = (description) ? createPhotosMarkup() : ``;
-  const descriptionMarkup = (pictures) ? createDescriptionMarkup() : ``;
+  const photosMarkup = (pictures.length > 0) ? createPhotosMarkup() : ``;
+  const descriptionMarkup = (description.length > 0) ? createDescriptionMarkup() : ``;
 
-  return (description || pictures) ? (`
+
+  return (photosMarkup && descriptionMarkup) ? (`
     <section class="event__section  event__section--destination">
       <h3 class="event__section-title  event__section-title--destination">Destination</h3>
       ${descriptionMarkup}
@@ -379,7 +380,7 @@ export default class PointEdit extends AbstractSmart {
     });
 
     destinationInput.addEventListener(`change`, () => {
-      this._destination = this._destinations[destinationInput.value.toLowerCase()] || {name: destinationInput.value};
+      this._destination = this._destinations[destinationInput.value.toLowerCase()] || {name: destinationInput.value, description: ``, pictures: []};
       this.rerender();
     });
   }

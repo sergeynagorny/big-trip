@@ -27,8 +27,8 @@ export default class Point {
       'date_to': this.date.checkOut.toISOString(),
       'destination': {
         'name': this.destination.name,
-        'description': this.destination.description,
-        'pictures': this.destination.pictures,
+        'description': this.destination.description || ` `,
+        'pictures': this.destination.pictures || [],
       },
       'base_price': this.price,
       'is_favorite': this.isFavorite,
